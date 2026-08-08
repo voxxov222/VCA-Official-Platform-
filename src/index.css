@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .font-display {
+    font-family: 'Orbitron', sans-serif;
+  }
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .font-sans {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  }
+
+  /* Holographic Sheen Effect */
+  .bg-holographic {
+    background: linear-gradient(
+      135deg,
+      rgba(34, 211, 238, 0.15) 0%,
+      rgba(167, 139, 250, 0.2) 30%,
+      rgba(251, 191, 36, 0.15) 70%,
+      rgba(34, 211, 238, 0.15) 100%
+    );
+  }
+
+  .bg-holographic-brushed {
+    background: 
+      linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(255,255,255,0.05) 100%),
+      linear-gradient(90deg, #22d3ee18, #a78bfa25, #fbbf2420, #22d3ee18);
+    background-size: 200% 200%;
+    animation: holographicShimmer 8s ease infinite;
+  }
+
+  .border-holographic {
+    border-image: linear-gradient(135deg, #22d3ee, #a78bfa, #fbbf24, #22d3ee) 1;
+  }
+
+  .text-holographic {
+    background: linear-gradient(135deg, #22d3ee 0%, #c084fc 40%, #fbbf24 80%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Glassmorphism card */
+  .glass-panel {
+    background: rgba(13, 18, 28, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-panel-interactive {
+    background: rgba(13, 18, 28, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-panel-interactive:hover {
+    border-color: rgba(34, 211, 238, 0.4);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);
+    transform: translateY(-2px);
+  }
+
+  /* HUD Scanlines overlay */
+  .hud-scanlines {
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(34, 211, 238, 0.03) 3px,
+      rgba(0, 0, 0, 0) 4px
+    );
+    pointer-events: none;
+  }
+}
+
+@keyframes holographicShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes radarSweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-radar {
+  animation: radarSweep 4s linear infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #05070a;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #22d3ee;
+}

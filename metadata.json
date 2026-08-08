@@ -1,0 +1,10 @@
+{
+  "name": "VCA — Verified Card Authority",
+  "description": "NFC-authenticated Pokémon trading card grading, AI vision camera scanner (VScan AI), real-time valuation engine, portfolio tracker, digital ownership ledger, and marketplace.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
