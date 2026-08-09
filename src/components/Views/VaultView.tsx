@@ -91,7 +91,7 @@ export const VaultView: React.FC<VaultViewProps> = ({ onOpenNfcModal }) => {
             {/* Card Content Body */}
             <div className="flex items-start gap-4">
               <HoloCardImage
-                src={slab.card?.imageUrl || ''}
+                src={slab.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'}
                 alt={slab.card?.name || (slab.card as any)?.pokemonName || 'Card'}
                 className="w-24 h-34 object-cover rounded-xl"
                 containerClassName="shrink-0"

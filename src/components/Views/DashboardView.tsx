@@ -205,7 +205,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               
               <div className="flex items-start gap-4">
                 <HoloCardImage
-                  src={slab.card?.imageUrl || ''}
+                  src={slab.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'}
                   alt={slab.card?.name || (slab.card as any)?.pokemonName || 'Card'}
                   className="w-20 h-28 object-cover rounded-xl"
                   containerClassName="shrink-0"

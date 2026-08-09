@@ -46,6 +46,12 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({ activeTab, setActiveTab, onC
       ]
     },
     {
+      title: 'COMMUNITY',
+      items: [
+        { tab: 'slabbook' as NavigationTab, label: 'Slabbook Social', desc: 'Facebook for Pokémon Collectors', icon: Sparkles, color: 'text-blue-400' },
+      ]
+    },
+    {
       title: 'LEDGER & ADMIN',
       items: [
         { tab: 'ledger' as NavigationTab, label: 'VCA Event Ledger', desc: 'Immutable block event history', icon: ShieldCheck, color: 'text-purple-300' },

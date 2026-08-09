@@ -142,7 +142,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               >
                 <div className="relative flex justify-center mb-2">
                   <img
-                    src={item.card?.imageUrl || ''}
+                    src={item.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'}
                     alt={item.card?.pokemonName || (item.card as any)?.name || 'Card'}
                     className="h-36 object-contain rounded-lg group-hover:scale-105 transition-transform"
                   />

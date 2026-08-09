@@ -16,7 +16,7 @@ import { VaultView } from './components/Views/VaultView';
 import { MarketplaceView } from './components/Views/MarketplaceView';
 import { MarketIntelligenceView } from './components/Views/MarketIntelligenceView';
 import { CardDatabaseView } from './components/Views/CardDatabaseView';
-import { FoilbookView } from './components/Views/FoilbookView';
+import { SlabbookView } from './components/Views/SlabbookView';
 import { ProfileView } from './components/Views/ProfileView';
 import { LedgerView } from './components/Views/LedgerView';
 import { AdminView } from './components/Views/AdminView';
@@ -127,8 +127,8 @@ export function App() {
             />
           )}
 
-          {currentView === 'foilbook' && (
-            <FoilbookView />
+          {currentView === 'slabbook' && (
+            <SlabbookView />
           )}
 
           {currentView === 'profile' && (

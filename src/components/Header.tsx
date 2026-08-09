@@ -52,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'market-intelligence', label: 'SIGNALS' },
     { id: 'watchlist', label: 'WATCHLIST' },
     { id: 'database', label: 'DATABASE' },
-    { id: 'foilbook', label: 'FOILBOOK' },
+    { id: 'slabbook', label: 'SLABBOOK' },
     { id: 'profile', label: 'PROFILE' },
     { id: 'ledger', label: 'LEDGER' },
     { id: 'admin', label: 'ADMIN QC' }
@@ -141,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
               {user ? (
                 <>
                   <img
-                    src={user.avatarUrl}
+                    src={user.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'}
                     alt={user.displayName}
                     className="w-5 h-5 rounded-full object-cover border border-cyan-400"
                   />

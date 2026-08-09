@@ -404,7 +404,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose, onToast }) => {
             {/* User Avatar Card */}
             <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex items-center gap-4">
               <img
-                src={currentUser.avatarUrl}
+                src={currentUser.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'}
                 alt={currentUser.displayName}
                 className="w-14 h-14 rounded-2xl object-cover border-2 border-cyan-400/50 shadow-md shrink-0"
               />

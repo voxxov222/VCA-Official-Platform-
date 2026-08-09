@@ -91,6 +91,8 @@ export const HoloCardImage: React.FC<HoloCardImageProps> = ({
     sheenOpacitySpring.set(0);
   };
 
+  const safeSrc = src && src.trim() !== '' ? src : 'https://images.pokemontcg.io/base1/4_hires.png';
+
   return (
     <motion.div
       ref={containerRef}
@@ -109,7 +111,7 @@ export const HoloCardImage: React.FC<HoloCardImageProps> = ({
     >
       {/* Base Card Image */}
       <img
-        src={src}
+        src={safeSrc}
         alt={alt}
         className={`${className} transition-transform duration-300 ${
           isHovered ? 'scale-105' : 'scale-100'

@@ -46,7 +46,7 @@ const POKEMON_BADGES = [
   { name: 'Venusaur', icon: '🌿', color: 'from-green-500 to-emerald-700', type: 'Grass/Poison' }
 ];
 
-export const FoilbookView: React.FC = () => {
+export const SlabbookView: React.FC = () => {
   const [navTab, setNavTab] = useState<'feed' | 'marketplace' | 'messages' | 'settings'>('feed');
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(getCurrentUser());
 
@@ -255,7 +255,7 @@ export const FoilbookView: React.FC = () => {
     setNavTab('messages');
     
     // Pre-populate initial context message if conversation is empty or add prompt
-    const initialPrompt = `Hi! I saw your listing for "${cardName}" on Foilbook Marketplace. Is it still available?`;
+    const initialPrompt = `Hi! I saw your listing for "${cardName}" on Slabbook Marketplace. Is it still available?`;
     setConversations(prev => {
       const currentMsgs = prev[sellerId] || [];
       return {
@@ -327,7 +327,7 @@ export const FoilbookView: React.FC = () => {
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input 
               type="text" 
-              placeholder="Search Foilbook..." 
+              placeholder="Search Slabbook..." 
               className="w-full bg-slate-900 border border-slate-800 rounded-full py-2 pl-9 pr-4 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
             />
           </div>
@@ -336,7 +336,7 @@ export const FoilbookView: React.FC = () => {
             onClick={() => setNavTab('settings')}
             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 hover:border-purple-500/50 text-xs font-bold text-slate-200 transition-colors cursor-pointer"
           >
-            <img src={userProfile.avatar} alt="Me" className="w-5 h-5 rounded-full object-cover" />
+            <img src={userProfile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} alt="Me" className="w-5 h-5 rounded-full object-cover" />
             <span className="hidden md:inline">{userProfile.displayName}</span>
             <span className="text-base leading-none">{selectedBadgeObj.icon}</span>
           </button>
@@ -353,7 +353,7 @@ export const FoilbookView: React.FC = () => {
             }`}
           >
             <div className="relative">
-              <img src={userProfile.avatar} alt="Profile" className="w-9 h-9 rounded-full object-cover border border-purple-400" />
+              <img src={userProfile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} alt="Profile" className="w-9 h-9 rounded-full object-cover border border-purple-400" />
               <span className="absolute -bottom-1 -right-1 text-xs">{selectedBadgeObj.icon}</span>
             </div>
             <div>
@@ -438,7 +438,7 @@ export const FoilbookView: React.FC = () => {
               {/* Create Post */}
               <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-800 p-4 shadow-xl">
                 <div className="flex gap-3 mb-4">
-                  <img src={userProfile.avatar} alt="You" className="w-10 h-10 rounded-full border border-purple-400 object-cover" />
+                  <img src={userProfile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} alt="You" className="w-10 h-10 rounded-full border border-purple-400 object-cover" />
                   <input 
                     type="text" 
                     placeholder={`What's on your mind, ${userProfile.displayName}? (Share a pull, slab, or trade)`} 
@@ -476,7 +476,7 @@ export const FoilbookView: React.FC = () => {
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <img src={post.avatar} alt={post.author} className="w-10 h-10 rounded-full object-cover border border-slate-700" />
+                          <img src={post.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} alt={post.author} className="w-10 h-10 rounded-full object-cover border border-slate-700" />
                           <div>
                             <div className="text-sm font-bold text-slate-100 flex items-center gap-1.5 hover:underline cursor-pointer">
                               <span>{post.author}</span>
@@ -504,7 +504,7 @@ export const FoilbookView: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex p-4 gap-4 items-center relative z-0">
-                            <img src={post.slab?.card?.imageUrl || ''} alt={post.slab?.card?.name || (post.slab?.card as any)?.pokemonName || 'Card'} className="w-24 h-auto object-contain rounded-lg shadow-2xl drop-shadow-[0_0_15px_rgba(34,211,238,0.2)]" />
+                            <img src={post.slab?.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'} alt={post.slab?.card?.name || (post.slab?.card as any)?.pokemonName || 'Card'} className="w-24 h-auto object-contain rounded-lg shadow-2xl drop-shadow-[0_0_15px_rgba(34,211,238,0.2)]" />
                             <div>
                               <div className="font-display font-black text-lg text-white mb-1">{post.slab?.card?.name || (post.slab?.card as any)?.pokemonName || 'Unknown Card'}</div>
                               <div className="text-xs font-mono text-cyan-300 font-bold mb-2">Grade #{post.slab?.overallGrade} • {post.slab?.serialNumber}</div>
@@ -570,7 +570,7 @@ export const FoilbookView: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-2 text-amber-400 font-mono text-xs font-bold uppercase mb-1">
                     <Store className="w-4 h-4" />
-                    <span>Foilbook Collector Marketplace</span>
+                    <span>Slabbook Collector Marketplace</span>
                   </div>
                   <h2 className="font-display font-black text-xl text-white">Buy, Sell & Trade Verified Slabs</h2>
                   <p className="text-xs text-slate-400 mt-1">Direct P2P trading with verified NTAG424 NFC chip authenticity</p>
@@ -591,7 +591,7 @@ export const FoilbookView: React.FC = () => {
                   <div key={item.id} className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 transition-all space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
                       <div className="flex items-center gap-3">
-                        <img src={item.sellerAvatar} alt={item.sellerName} className="w-9 h-9 rounded-full object-cover border border-slate-700" />
+                        <img src={item.sellerAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} alt={item.sellerName} className="w-9 h-9 rounded-full object-cover border border-slate-700" />
                         <div>
                           <div className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                             <span>{item.sellerName}</span>
@@ -666,7 +666,7 @@ export const FoilbookView: React.FC = () => {
                       }`}
                     >
                       <div className="relative">
-                        <img src={c.avatar} alt={c.name} className="w-10 h-10 rounded-full object-cover" />
+                        <img src={c.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} alt={c.name} className="w-10 h-10 rounded-full object-cover" />
                         {c.online && <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full" />}
                       </div>
                       <div className="flex-1 overflow-hidden">
@@ -686,7 +686,7 @@ export const FoilbookView: React.FC = () => {
                       {/* Active Contact Bar */}
                       <div className="p-3 border-b border-slate-800 flex items-center justify-between bg-slate-900/40">
                         <div className="flex items-center gap-3">
-                          <img src={activeContactInfo.avatar} alt={activeContactInfo.name} className="w-8 h-8 rounded-full object-cover" />
+                          <img src={activeContactInfo.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} alt={activeContactInfo.name} className="w-8 h-8 rounded-full object-cover" />
                           <div>
                             <div className="text-xs font-bold text-white">{activeContactInfo.name}</div>
                             <div className="text-[10px] font-mono text-emerald-400">● Active now</div>
@@ -752,7 +752,7 @@ export const FoilbookView: React.FC = () => {
                     <Settings className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="font-display font-black text-lg text-white">Foilbook Profile Settings</h2>
+                    <h2 className="font-display font-black text-lg text-white">Slabbook Profile Settings</h2>
                     <p className="text-xs text-slate-400">Customize your display name, bio, and favorite Pokémon badge</p>
                   </div>
                 </div>
@@ -768,7 +768,7 @@ export const FoilbookView: React.FC = () => {
               {/* Profile Preview Card */}
               <div className="p-5 rounded-2xl bg-gradient-to-r from-purple-950/40 via-slate-950 to-indigo-950/40 border border-purple-500/30 flex items-center gap-5">
                 <div className="relative">
-                  <img src={userProfile.avatar} alt={userProfile.displayName} className="w-16 h-16 rounded-full object-cover border-2 border-purple-400 shadow-xl" />
+                  <img src={userProfile.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} alt={userProfile.displayName} className="w-16 h-16 rounded-full object-cover border-2 border-purple-400 shadow-xl" />
                   <span className="absolute -bottom-1 -right-1 text-xl">{selectedBadgeObj.icon}</span>
                 </div>
                 <div className="space-y-1">
@@ -873,7 +873,7 @@ export const FoilbookView: React.FC = () => {
         <div className="hidden lg:block col-span-1 space-y-4">
           <div className="bg-slate-900/60 rounded-2xl border border-slate-800 p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-bold text-slate-400 uppercase font-mono">Foilbook Contacts</h3>
+              <h3 className="text-xs font-bold text-slate-400 uppercase font-mono">Slabbook Contacts</h3>
               <span className="text-[10px] font-mono text-emerald-400">4 Online</span>
             </div>
             <div className="space-y-1">
@@ -887,7 +887,7 @@ export const FoilbookView: React.FC = () => {
                   className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-800/80 transition-colors text-left group cursor-pointer"
                 >
                   <div className="relative">
-                    <img src={contact.avatar} alt={contact.name} className="w-8 h-8 rounded-full object-cover border border-slate-800" />
+                    <img src={contact.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'} alt={contact.name} className="w-8 h-8 rounded-full object-cover border border-slate-800" />
                     {contact.online && (
                       <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#05070a] rounded-full"></div>
                     )}
@@ -910,7 +910,7 @@ export const FoilbookView: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="font-display font-black text-sm text-white flex items-center gap-2">
                 <Store className="w-4 h-4 text-amber-400" />
-                <span>List Card on Foilbook Marketplace</span>
+                <span>List Card on Slabbook Marketplace</span>
               </h3>
               <button onClick={() => setShowCreateListingModal(false)} className="text-slate-400 hover:text-white cursor-pointer">
                 <X className="w-5 h-5" />

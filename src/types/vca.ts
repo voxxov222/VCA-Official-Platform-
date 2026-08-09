@@ -10,6 +10,7 @@ export type NavigationTab =
   | 'watchlist'
   | 'alerts'
   | 'settings'
+  | 'slabbook'
   | 'admin';
 
 export type CardVariant = 

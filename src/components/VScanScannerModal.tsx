@@ -175,10 +175,10 @@ export const VScanScannerModal: React.FC<VScanScannerModalProps> = ({
     setScanStep('CAPTURING & straightening optical perspective...');
     await new Promise(r => setTimeout(r, 600));
 
-    setScanStep('RUNNING OCR & visual feature extraction...');
+    setScanStep('RUNNING YOLOv8 & FAISS visual feature extraction...');
     await new Promise(r => setTimeout(r, 700));
 
-    setScanStep('MATCHING against Pokémon TCG Database...');
+    setScanStep('MATCHING against Pokémon TCG Database & FAISS Index...');
     await new Promise(r => setTimeout(r, 700));
 
     setScanStep('CALLING Gemini 3.6 Vision Analysis Engine...');
@@ -467,19 +467,42 @@ export const VScanScannerModal: React.FC<VScanScannerModalProps> = ({
                   </div>
                 </div>
 
-                <div className="relative aspect-video max-h-[360px] rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex items-center justify-center">
+                <div className="relative aspect-[3/4] max-h-[500px] max-w-sm mx-auto rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden flex flex-col items-center justify-center">
                   {cameraActive ? (
                     <>
-                      <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+                      <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
+                      
+                      {/* Bounding box inspired by pokecollector */}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] aspect-[2.5/3.5] rounded-xl border-2 border-dashed border-cyan-500/40 bg-cyan-500/5 pointer-events-none z-10 flex flex-col items-center justify-center">
+                        <div className="absolute top-2 left-2 w-6 h-6 border-t-2 border-l-2 border-cyan-400 rounded-tl-lg" />
+                        <div className="absolute top-2 right-2 w-6 h-6 border-t-2 border-r-2 border-cyan-400 rounded-tr-lg" />
+                        <div className="absolute bottom-2 left-2 w-6 h-6 border-b-2 border-l-2 border-cyan-400 rounded-bl-lg" />
+                        <div className="absolute bottom-2 right-2 w-6 h-6 border-b-2 border-r-2 border-cyan-400 rounded-br-lg" />
+                        <Camera size={40} className="text-cyan-400/40 mb-2" />
+                        <p className="text-[10px] text-cyan-200/60 font-mono tracking-widest uppercase">Align Card</p>
+                      </div>
+
                       {/* Interactive overlay capture trigger button */}
                       <button
                         onClick={() => mode === 'single' ? handleAnalyzeCard() : handleAnalyzeMulti()}
                         disabled={isAnalyzing}
-                        className="absolute bottom-4 left-1/2 -translate-x-1/2 px-6 py-2.5 rounded-full bg-cyan-500/90 hover:bg-cyan-400 text-slate-950 font-display font-black text-xs tracking-wider shadow-[0_0_25px_rgba(34,211,238,0.7)] flex items-center gap-2 cursor-pointer transition-all hover:scale-105 z-20"
+                        className="absolute bottom-16 left-1/2 -translate-x-1/2 w-10/12 max-w-xs py-3.5 rounded-2xl bg-cyan-500 text-slate-950 font-display font-black text-sm tracking-wider shadow-[0_0_24px_rgba(34,211,238,0.4)] flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105 z-20"
                       >
-                        <Scan className="w-4 h-4 text-slate-950" />
-                        <span>CAPTURE FRAME & SCAN</span>
+                        <Camera className="w-5 h-5 text-slate-950" />
+                        <span>TAKE PHOTO</span>
                       </button>
+                      <label className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs text-cyan-400 hover:text-cyan-200 font-mono flex items-center gap-2 cursor-pointer z-20 transition-colors">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload Image</span>
+                        <input
+                           type="file"
+                           accept="image/*"
+                           className="hidden"
+                           onChange={(e) => {
+                            if (e.target.files?.[0]) handleFileUpload(e.target.files[0]);
+                           }}
+                        />
+                      </label>
                     </>
                   ) : (
                     <div className="p-8 text-center space-y-4 max-w-md">
@@ -516,27 +539,8 @@ export const VScanScannerModal: React.FC<VScanScannerModalProps> = ({
                   )}
 
                   {/* HUD Scanline overlay */}
-                  <div className="absolute inset-0 hud-scanlines pointer-events-none opacity-40" />
+                  <div className="absolute inset-0 hud-scanlines pointer-events-none opacity-40 z-0" />
 
-                  {/* Red Dashed Alignment Frame overlay matching design specs */}
-                  {cameraActive && (
-                    <div className="absolute inset-6 sm:inset-10 border-2 border-dashed border-rose-500/80 rounded-3xl pointer-events-none flex flex-col items-center justify-between p-3 shadow-[0_0_30px_rgba(244,63,94,0.15)]">
-                      <div className="text-[10px] font-mono text-rose-300 bg-slate-950/85 px-3 py-1 rounded-full border border-rose-500/40 font-bold">
-                        ALIGN POKÉMON CARD WITHIN FRAME
-                      </div>
-
-                      {/* Bottom status badge in camera overlay */}
-                      <div className="bg-slate-950/85 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-800 flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center text-cyan-300 text-xs font-bold">
-                          🔍
-                        </div>
-                        <div className="text-left">
-                          <div className="text-[11px] font-bold text-slate-200">No cards scanned yet</div>
-                          <div className="text-[9px] text-slate-400">Point camera at card to begin</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* SCAN MODE SETTINGS DRAWER / SHEET (Matching Design Specs) */}
@@ -842,8 +846,32 @@ export const VScanScannerModal: React.FC<VScanScannerModalProps> = ({
         {scanResult && (
           <div className="space-y-6">
             
+            {/* BEST MATCHES GRID (Pokecollector inspired) */}
+            {scanResult.alternatives && scanResult.alternatives.length > 0 && (
+              <div>
+                <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  BEST MATCHES ({scanResult.alternatives.length + 1})
+                </p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <div className="rounded-xl border border-cyan-500 bg-cyan-500/10 p-2 cursor-pointer transition-colors relative">
+                    <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-cyan-400" />
+                    <img src={scanResult.card.imageUrl} alt={scanResult.card.name} className="w-full aspect-[2.5/3.5] object-cover rounded-lg mb-2 opacity-100" />
+                    <p className="text-xs font-bold text-slate-100 truncate">{scanResult.card.name}</p>
+                    <p className="text-[10px] font-mono text-cyan-300">{scanResult.confidence}% MATCH</p>
+                  </div>
+                  {scanResult.alternatives.map((alt: any, idx: number) => (
+                    <div key={idx} className="rounded-xl border border-slate-800 bg-slate-900/50 p-2 cursor-pointer hover:bg-slate-800 transition-colors">
+                      <img src={scanResult.card.imageUrl} alt={alt.name} className="w-full aspect-[2.5/3.5] object-cover rounded-lg mb-2 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all" />
+                      <p className="text-xs font-bold text-slate-400 truncate hover:text-slate-200">{alt.name}</p>
+                      <p className="text-[10px] font-mono text-slate-500">{alt.confidence}% MATCH</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Top Identity Banner */}
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-4">
+            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap items-center justify-between gap-4 sticky bottom-4 z-50 shadow-2xl">
               <div className="flex items-center gap-4">
                 <img
                   src={scanResult.card.imageUrl}

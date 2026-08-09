@@ -64,7 +64,7 @@ export const MarketplaceView: React.FC = () => {
           {buyNowListings.map(item => (
             <div key={item.id} className="glass-panel p-4 rounded-2xl border-slate-800 space-y-3 flex flex-col justify-between">
               <div className="relative flex justify-center pt-2">
-                <img src={item.card?.imageUrl || ''} alt={item.card?.pokemonName || (item.card as any)?.name || 'Card'} className="h-44 object-contain rounded-xl" />
+                <img src={item.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'} alt={item.card?.pokemonName || (item.card as any)?.name || 'Card'} className="h-44 object-contain rounded-xl" />
                 <span className="absolute top-0 right-0 bg-amber-500 text-slate-950 font-mono font-black text-[9px] px-2 py-0.5 rounded uppercase">
                   #{item.grade} GEM MINT
                 </span>
@@ -99,7 +99,7 @@ export const MarketplaceView: React.FC = () => {
           {auctionListings.map(auc => (
             <div key={auc.id} className="glass-panel p-4 rounded-2xl border-rose-500/30 space-y-3 flex flex-col justify-between bg-rose-950/10">
               <div className="relative flex justify-center pt-2">
-                <img src={auc.card?.imageUrl || ''} alt={auc.card?.pokemonName || (auc.card as any)?.name || 'Card'} className="h-44 object-contain rounded-xl" />
+                <img src={auc.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'} alt={auc.card?.pokemonName || (auc.card as any)?.name || 'Card'} className="h-44 object-contain rounded-xl" />
                 <span className="absolute top-0 right-0 bg-rose-500 text-slate-950 font-mono font-black text-[9px] px-2 py-0.5 rounded uppercase flex items-center gap-1">
                   <Flame className="w-3 h-3" />
                   <span>#{auc.grade} GEM MINT</span>

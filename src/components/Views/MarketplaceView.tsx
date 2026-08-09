@@ -315,7 +315,7 @@ export const MarketplaceView: React.FC = () => {
               {/* Card info */}
               <div className="flex items-start gap-4">
                 <HoloCardImage
-                  src={auc.slab?.card?.imageUrl || ''}
+                  src={auc.slab?.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'}
                   alt={auc.slab?.card?.name || (auc.slab?.card as any)?.pokemonName || 'Card'}
                   className="w-24 h-34 object-cover rounded-xl"
                   containerClassName="shrink-0"
@@ -395,7 +395,7 @@ export const MarketplaceView: React.FC = () => {
 
               <div className="flex items-start gap-4">
                 <HoloCardImage
-                  src={item.slab?.card?.imageUrl || ''}
+                  src={item.slab?.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'}
                   alt={item.slab?.card?.name || (item.slab?.card as any)?.pokemonName || 'Card'}
                   className="w-20 h-28 object-cover rounded-xl"
                   containerClassName="shrink-0"

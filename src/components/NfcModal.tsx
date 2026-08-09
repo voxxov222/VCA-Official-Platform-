@@ -158,7 +158,7 @@ export const NfcModal: React.FC<NfcModalProps> = ({
             {/* Slab summary card */}
             <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-4">
               <img
-                src={targetSlab.card?.imageUrl || ''}
+                src={targetSlab.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'}
                 alt={targetSlab.card?.name || (targetSlab.card as any)?.pokemonName || 'Card'}
                 className="w-16 h-22 object-cover rounded-lg border border-slate-700 shadow-md shrink-0"
               />

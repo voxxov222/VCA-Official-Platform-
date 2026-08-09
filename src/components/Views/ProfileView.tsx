@@ -89,7 +89,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       const base64 = event.target?.result as string;
       setAvatarPreview(base64);
       await updateUserProfile({ avatarUrl: base64 });
-      if (onToast) onToast('Profile picture updated & synced across VCA and Foilbook!');
+      if (onToast) onToast('Profile picture updated & synced across VCA and Slabbook!');
     };
     reader.readAsDataURL(file);
   };
@@ -104,7 +104,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       const base64 = event.target?.result as string;
       setCoverPreview(base64);
       await updateUserProfile({ coverUrl: base64 });
-      if (onToast) onToast('Cover banner updated & synced across VCA and Foilbook!');
+      if (onToast) onToast('Cover banner updated & synced across VCA and Slabbook!');
     };
     reader.readAsDataURL(file);
   };
@@ -123,7 +123,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       });
       setUser(updated);
       setIsEditing(false);
-      if (onToast) onToast('Profile details synchronized across VCA and Foilbook!');
+      if (onToast) onToast('Profile details synchronized across VCA and Slabbook!');
     } catch (err) {
       if (onToast) onToast('Failed to save profile changes.');
     }
@@ -432,7 +432,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             >
               <div className="relative rounded-2xl bg-slate-950 p-4 border border-slate-800 flex items-center justify-center overflow-hidden">
                 <HoloCardImage
-                  src={slab.card?.imageUrl || ''}
+                  src={slab.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'}
                   alt={slab.card?.name || (slab.card as any)?.pokemonName || 'Card'}
                   className="h-56 object-contain"
                   containerClassName="h-56"

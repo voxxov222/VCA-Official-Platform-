@@ -215,7 +215,7 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({ onOpenScanner, onS
                   <div key={item.id} className="glass-panel p-5 rounded-3xl border border-slate-800 space-y-4 relative group">
                     <div className="flex gap-4">
                       <img
-                        src={item.card?.imageUrl || ''}
+                        src={item.card?.imageUrl || 'https://images.pokemontcg.io/base1/4_hires.png'}
                         alt={item.card?.pokemonName || (item.card as any)?.name || 'Card'}
                         className="w-20 h-28 object-cover rounded-xl border border-amber-500/30 shadow-lg shrink-0"
                       />
