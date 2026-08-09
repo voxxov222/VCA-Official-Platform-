@@ -1,131 +1,229 @@
 # 🛡️ VCA — VERIFIED CARD AUTHORITY
-### *Next-Generation Collectible Authentication, NFC Smart Slabs, AI Grading & Slabbook Social Platform*
+### *Next-Generation Collectible Authentication, NFC Smart Slabs, AI Grading & Foilbook Social Network*
 
 [![Platform Status](https://img.shields.io/badge/VCA_System-Online_100%25-22d3ee.svg)](#)
-[![NTAG424 Security](https://img.shields.io/badge/NFC_Protocol-NTAG424_DNA_CMAC-emerald.svg)](#)
+[![NFC Protocol](https://img.shields.io/badge/NFC_Protocol-NTAG424_DNA_CMAC-emerald.svg)](#)
 [![AI Engine](https://img.shields.io/badge/Vision_AI-Gemini_3.6_Multimodal-indigo.svg)](#)
-[![License](https://img.shields.io/badge/License-MIT-purple.svg)](#)
+[![Social Layer](https://img.shields.io/badge/Social_Network-Foilbook_Slabbook-purple.svg)](#)
+[![License](https://img.shields.io/badge/License-MIT-gold.svg)](#)
 
-VCA (Verified Card Authority) is a production-grade collectible trading card grading, authentication, market intelligence, and social platform for Pokémon card collectors and investors. It integrates computer vision AI (VScan AI), NTAG424 DNA CMAC encrypted physical smart slabs, an immutable cryptographic SHA-256 ledger, real-time multi-market price consensus, and **Foilbook (Slabbook)** — a full-featured Facebook-style social network with direct live messaging for Pokémon collectors.
+**VCA (Verified Card Authority)** is an enterprise-grade collectible trading card grading, authentication, market intelligence, and social ecosystem built specifically for Pokémon card collectors, investors, and hobbyists. 
 
----
-
-## 📸 APPLICATION SCREENSHOTS & SYSTEM ARCHITECTURE
-
-```
-┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│  🛡️ VCA VERIFIED CARD AUTHORITY  │ [📷 VSCAN AI]  │  ((o)) NFC TAP  │ [👤 Alex Vance]    │
-├─────────────────────────────────────────────────────────────────────────────────────────┤
-│ ⚡ BREAKING WIRE: 🟢 CHARIZARD BASE SET 1ST ED PSA 10 SURGES +14.8% TO $9,850 CAD      │
-├─────────────────────────────────────────────────────────────────────────────────────────┤
-│                                                                                         │
-│  📊 INVESTMENT DASHBOARD                                                                │
-│  TOTAL VAULT VALUE: $42,850.00 CAD  │  AUTHENTICATED SLABS: 14 SLABS (100% CMAC OK)    │
-│  AVERAGE GRADE: 9.6 / 10            │  PENDING SUBMISSIONS: 2 IN QC                      │
-│                                                                                         │
-│  [📈 30-Day Valuation Curve]  │  [🍩 Set Allocation Chart]                             │
-│                                                                                         │
-│  AUTHENTICATED SLABS SHOWCASE:                                                          │
-│  ┌──────────────────────────┐  ┌──────────────────────────┐                             │
-│  │ ⚡ Pikachu #173/165      │  │ 🔥 Charizard #4/102      │                             │
-│  │ 151 (Scarlet & Violet)   │  │ Base Set • 1st Edition    │                             │
-│  │ VCA #10 GEM MINT         │  │ VCA #9 MINT              │                             │
-│  │ Est. CAD $2,850          │  │ Est. CAD $1,650          │                             │
-│  └──────────────────────────┘  └──────────────────────────┘                             │
-│                                                                                         │
-└─────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
-### 1. 📊 Investment Dashboard & Portfolio Analytics
-Real-time vault valuation tracking, 30-day performance curves (Recharts), set allocation breakdown, average grade score calculation, and verified slab management.
-
-![Investment Dashboard](https://raw.githubusercontent.com/t-sinclair2500/pokemon-scanner/main/docs/dashboard_mockup.png)
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  ((o)) NTAG424 CMAC NFC TAP VERIFICATION                    │
-│  Encrypted Smart Slab DNA Verification                      │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│                      ((  ((( 🛈 )))  ))                    │
-│                    TAP TO SCAN SMART SLAB                   │
-│                                                             │
-│  ✅ AUTHENTICATED • SEAL INTACT (100% CMAC OK)              │
-│  NTAG424 CMAC Match: E0040150993B41C2                       │
-│                                                             │
-│  Pikachu 151 (Scarlet & Violet) #173/165                    │
-│  Est. CAD $2,850 • [VCA | #10 GEM MINT ((o))]               │
-│                                                             │
-│  [View Details] [Sign as Owner] [List for Sale] [Ledger]    │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 2. 🛈 NTAG424 DNA Encrypted NFC Verification
-Tap-to-verify interface reading hardware NTAG424 DNA smart slabs. Executes SUN/CMAC dynamic signature validation against the VCA ledger to detect tampering, cloning, or physical slab forgery.
-
-### 3. 📜 Immutable Ownership & Scan Ledger
-Audit log of all card events (`CARD_SCANNED`, `CARD_IDENTIFIED`, `CARD_GRADED`, `NFC_LINKED`, `OWNERSHIP_SIGNED`, `CARD_TRANSFERRED`). Every event contains previous and current SHA-256 cryptographic hashes and actor signatures.
-
-### 4. 🛍️ Verified Marketplace & Live Auctions
-Live auction rooms with real-time countdowns, active bid feeds, instant buy-now listings, and zero-fraud escrow guarantees.
-
-### 5. 💬 Foilbook (Slabbook) & Direct Messenger
-A full-featured social platform for Pokémon collectors with profile customization, photo posts, collection highlights, live 1:1 messaging, and embedded slab trade proposals.
+It seamlessly combines:
+* **VScan AI**: Multimodal Computer Vision card scanner powering automated 10-point VGAS condition scoring (Centering, Corners, Edges, Surface).
+* **NTAG424 DNA Smart Slabs**: Hardware-encrypted NFC smart slabs with dynamic SUN/CMAC verification signatures to eliminate counterfeit slabs and cloned certificates.
+* **Cryptographic Ledger**: SHA-256 hash-chained event ledger tracking complete slab ownership, transfers, digital signatures, and grading history.
+* **Real-Time Market Consensus Engine**: Multi-tier market valuation blending Raw, PSA 9, and PSA 10 sales data with custom 30-day index trendlines.
+* **Foilbook (Slabbook)**: A Facebook-inspired Pokémon collector social network featuring profile customization, image posts, collection showcases, live 1:1 direct messaging, and embedded slab trade proposals.
 
 ---
 
-## ⚡ CORE FEATURES
+## 📸 APPLICATION SCREENSHOTS & VISUAL ARCHITECTURE
 
-### 1. 📸 VScan AI Camera & Condition Scoring
-* **Multimodal Vision Model**: Powered by Google Gemini 3.6 for automated set, card number, variant (1st Edition, Shadowless, Holo, Reverse Holo, Alt Art, SIR), and language identification.
-* **10-Step Guided Submission**: Capture front, back, low-angle warp shots, 4 corner reticles, and 4 edge reticles.
-* **VGAS 10-Point Scoring**: Returns subgrade breakdowns for Centering, Corners, Edges, and Surface.
+### 1. 🛡️ 3D Holographic Smart Slab & Landing Hero
+*Interactive 3D acrylic slab viewer with holographic label stickers, NTAG424 DNA encryption badge, and real-time vault statistics.*
 
-### 2. 🛈 NTAG424 DNA Smart Slabs & Cryptographic Ledger
-* **NFC Verification**: Reads dynamic CMAC encryption keys embedded in physical VCA acrylic slabs.
-* **Digital Ownership Signature**: Owners can append a cursive cryptographic signature directly onto the slab's ledger record.
-* **Transfer & Escrow**: Ownership transfers produce verifiable PDF-style transfer certificates.
-
-### 3. 👤 Profile & Custom Image Upload
-* **Custom Profile Photo Upload**: Upload custom avatar photos (`image/*`) with instant base64 preview and persistence across header, posts, and messaging.
-* **Custom Cover Banner**: Upload custom profile header images.
-* **Collector Credentials**: Display Name, Username/Handle, Bio, Favorite Pokémon, Location, and Verified Trader Badges.
-
-### 4. 📺 CNN-Style Live Pokémon News & Rare Price Wire
-* **Pulsing Live Ticker**: Top-of-page CNN-style marquee streaming live market updates.
-* **Live Rare Card Prices**: Real-time sales tracking for Charizard 1st Ed, Pikachu 151 SIR, Umbreon VMAX Alt Art, Illustrator Pikachu, and Lugia Neo Genesis.
-* **CNN News Broadcast Room**: Interactive news drawer with breaking market news, auction records, and VCA platform updates.
+![VCA 3D Holographic Slab & Hero](./docs/hero_3d_slab.svg)
 
 ---
 
-## 🛠️ TECH STACK
+### 2. 📸 VScan AI Camera Scanner & Optical Metric Engine
+*10-step guided optical capture pipeline analyzing front, back, low-angle raking shots, 4 corners, and 4 edges with real-time market comps.*
 
-* **Frontend**: React 18, TypeScript, Vite, Tailwind CSS
-* **Icons**: Lucide React
-* **Data Visualization**: Recharts
-* **State & Persistence**: LocalStorage sync service, Auth Service with Reactive Subscriptions
-* **Camera & Hardware**: Web Camera API, Web NFC API (`NDEFReader`)
+![VScan AI Camera Scanner](./docs/vscan_ai_scanner.svg)
+
+---
+
+### 3. 💬 Foilbook (Slabbook) Collector Social Network & Direct Messenger
+*Facebook-style social hub for Pokémon collectors featuring live chat, profile customization, posts, and embedded verified slab trade proposals.*
+
+![Foilbook Direct Messenger](./docs/foilbook_social.svg)
+
+---
+
+## 🖼️ GUIDE: HOW TO ADD YOUR OWN CUSTOM IMAGES TO THIS README
+
+You can easily replace the diagrams above or add your own live web screenshots, camera capture photos, or slab mockups to this `README.md`. Follow these step-by-step methods:
+
+### Method 1: Local Repo Directory (Recommended for Version Control)
+
+1. **Take your screenshot / picture**: Capture your application running in your browser or a photo of your physical card slab.
+2. **Save the image file**: Save it as a PNG or JPG inside the `/docs/` folder in your project directory (e.g., `/docs/my_dashboard_screenshot.png`).
+3. **Reference it in `README.md`**:
+   ```markdown
+   ![My VCA Dashboard](./docs/my_dashboard_screenshot.png)
+   ```
+4. **Commit & Push**:
+   ```bash
+   git add docs/my_dashboard_screenshot.png README.md
+   git commit -m "docs: add custom dashboard screenshot"
+   git push origin main
+   ```
+
+---
+
+### Method 2: Drag and Drop via GitHub Web Interface (Easiest & Cloud-Hosted)
+
+1. Open your GitHub repository in your web browser.
+2. Click on **`README.md`** and select the **Edit (pencil icon)** button.
+3. Drag and drop any `.png`, `.jpg`, or `.gif` image directly into the markdown editor text area.
+4. GitHub will automatically upload the image to their secure CDN and generate a URL link like this:
+   ```markdown
+   ![Screen Shot 2026-08-09](https://github.com/user-attachments/assets/xxxx-xxxx-xxxx)
+   ```
+5. Click **Commit changes...** at the top right.
+
+---
+
+### Method 3: Using Image HTML Tags for Centering and Custom Sizing
+
+If you want custom widths, borders, or centered layouts for your screenshots:
+
+```html
+<p align="center">
+  <img src="./docs/my_dashboard_screenshot.png" alt="VCA Dashboard" width="90%" style="border-radius: 12px; border: 1px solid #22d3ee;" />
+</p>
+```
+
+#### Recommended Image Specifications:
+* **Resolution**: 1920×1080 (1080p) or 2560×1440 (1440p) for high-DPI crispness.
+* **Format**: `.png` (for crisp UI text) or `.svg` (for vector graphics).
+* **Aspect Ratio**: 16:9 for full-screen dashboards, 4:3 for card detail closeups.
+
+---
+
+## ⚡ CORE FEATURE BREAKDOWN
+
+### 1. 📸 VScan AI Camera & VGAS 10-Point Condition Scoring
+* **Multimodal Card Recognition**: Powered by Google Gemini 3.6 Vision for instant card identification (Set, Number, Rarity, Illustrator, Language, and Print Variant e.g. 1st Edition, Holo, SIR, Alt Art).
+* **10-Stage Guided Capture**:
+  1. Card Variant Detection
+  2. Front Flat Shot with scanline HUD sweep
+  3. Reverse Flat Shot
+  4. Low-Angle Raking Shots (Left & Bottom Edges for warping/bowing detection)
+  5. Corner Close-Ups (×4) with reticle zoom
+  6. Edge Close-Ups (×4)
+  7. Centering Margins Computation
+  8. AI Condition Summary Breakdown
+  9. Submission Queueing
+  10. NTAG424 Serial Minting (`VCA-XXX-XXX-XXX`)
+* **VGAS Scoring**: Computes subgrades for **Centering**, **Corners**, **Edges**, and **Surface**.
+
+---
+
+### 2. 🛈 NTAG424 DNA Encrypted Smart Slabs & Cryptographic Ledger
+* **Hardware CMAC Verification**: Uses Web NFC (`NDEFReader`) to read dynamic SUN/CMAC cryptographic signatures embedded in NTAG424 DNA chips.
+* **Tamper & Clone Detection**: Validates physical slab serial numbers against the append-only ledger to detect cloned labels or physical slab tampering.
+* **Digital Ownership Signatures**: Current slab owners can apply a cryptographic cursive signature directly onto their slab record.
+* **Transfer Certificates**: Generates verifiable PDF-style transfer certificates when transferring or selling slabs.
+
+---
+
+### 3. 📊 Investment Dashboard & Vault Analytics
+* **Real-Time Valuation**: Blends Raw, PSA 9, and PSA 10 market prices into a live Vault Index.
+* **Recharts Visualizations**: 30-day valuation performance curves and interactive set allocation donut charts.
+* **Vault Management**: View, filter, and organize owned slabs with quick NFC tap verification checks.
+
+---
+
+### 4. 💬 Foilbook (Slabbook) Pokémon Collector Social Network
+* **Facebook-Style Social Feed**: Share card pulls, showcase graded slabs, and post updates to the collector community.
+* **Profile Customization**: Custom avatar uploads, cover banners, collector bio, location, and verified trader badges.
+* **Live Direct Messenger**: Real-time 1:1 chat with active online status indicators and embedded slab trade proposals.
+
+---
+
+### 5. 📺 Breaking Market Wire & Real-Time Price Ticker
+* **Scrolling Marquee**: Top-of-page CNN-style ticker streaming real-time sales alerts, auction records, and market movements.
+* **Interactive News Broadcast Room**: Drawer overlay detailing rare card price movements (Charizard 1st Ed, Pikachu 151 SIR, Umbreon VMAX Alt Art).
+
+---
+
+### 6. 🛍️ Verified Marketplace & Live Auctions
+* **Live Auction Rooms**: Real-time countdown timers, live bid ticker, watcher counters, and animated high-bid pulses.
+* **Buy-Now & Offer System**: Negotiate trades and purchase verified slabs backed by zero-fraud escrow logs.
+
+---
+
+## 🛠️ TECH STACK & SYSTEM DEPENDENCIES
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend Framework** | React 18, TypeScript, Vite |
+| **Styling & UI** | Tailwind CSS, Lucide React Icons |
+| **Data Visualization** | Recharts (Valuation curves, Set Allocation) |
+| **AI Vision Engine** | Google Gemini 3.6 Multimodal API |
+| **Hardware Integration** | Web NFC API (`NDEFReader`), Web Camera API |
+| **State & Storage** | LocalStorage Reactive Sync Service, Auth Service |
+
+---
+
+## 📁 PROJECT DIRECTORY STRUCTURE
+
+```
+pokemon-scanner/
+├── docs/                        # Diagram assets and documentation screenshots
+│   ├── hero_3d_slab.svg         # 3D Slab Landing Graphic
+│   ├── vscan_ai_scanner.svg     # VScan AI Camera Reticle Graphic
+│   └── foilbook_social.svg      # Direct Messenger & Foilbook Graphic
+├── src/
+│   ├── components/              # UI Components
+│   │   ├── BreakingWire.tsx     # CNN News Ticker
+│   │   ├── FoilbookView.tsx     # Facebook Clone Social Network & Chat
+│   │   ├── GradingSubmissionWizard.tsx  # VScan AI 10-Step Submission
+│   │   ├── NfcModal.tsx         # NTAG424 CMAC Tap Verification
+│   │   ├── ProfileView.tsx      # Collector Profile & Avatar Uploads
+│   │   └── Slab3DViewer.tsx     # Interactive 3D Holographic Slab
+│   ├── services/                # LocalStorage & Auth Reactive Stores
+│   ├── types/                   # TypeScript Type Definitions
+│   ├── App.tsx                  # Root View Controller & Layout
+│   ├── main.tsx                 # Entry Point
+│   └── index.css                # Custom HUD Animations & Glitch FX
+├── public/                      # Static Assets
+├── .env.example                 # Environment Variables Template
+├── package.json                 # Dependencies & Build Scripts
+└── README.md                    # Platform Documentation
+```
 
 ---
 
 ## 🚀 QUICK START & LOCAL DEVELOPMENT
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/t-sinclair2500/pokemon-scanner.git
-cd pokemon-scanner
+### Prerequisites
+* **Node.js**: v18.0.0 or higher
+* **npm** or **bun**
 
-# 2. Install dependencies
-npm install
+### Installation Steps
 
-# 3. Start development server
-npm run dev
-```
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/t-sinclair2500/pokemon-scanner.git
+   cd pokemon-scanner
+   ```
 
-The application will launch on `http://localhost:3000`.
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables**:
+   Copy `.env.example` to `.env` and set your optional Gemini API key:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **Start the Development Server**:
+   ```bash
+   npm run dev
+   ```
+
+5. **Open in Browser**:
+   Navigate to `http://localhost:3000` to access the live application.
 
 ---
 
 ## 📄 LICENSE
 
-Licensed under the MIT License. Copyright © 2026 VCA Verified Card Authority.
+This project is licensed under the **MIT License**.
+
+*Copyright © 2026 VCA Verified Card Authority. All Rights Reserved.*

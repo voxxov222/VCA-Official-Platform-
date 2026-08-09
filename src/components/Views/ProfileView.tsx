@@ -29,6 +29,7 @@ import { getCurrentUser, updateUserProfile, subscribeAuth } from '../../services
 import { UserProfile, VCASlab } from '../../types';
 import { MOCK_SLABS } from '../../mockData/cards';
 import { HolographicLabel } from '../HolographicLabel';
+import { HoloCardImage } from '../HoloCardImage';
 
 interface ProfileViewProps {
   onNavigate?: (view: string) => void;
@@ -430,10 +431,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               className="p-4 rounded-3xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/40 transition-all space-y-3 group"
             >
               <div className="relative rounded-2xl bg-slate-950 p-4 border border-slate-800 flex items-center justify-center overflow-hidden">
-                <img
-                  src={slab.card.imageUrl}
-                  alt={slab.card.name}
-                  className="h-56 object-contain group-hover:scale-105 transition-transform"
+                <HoloCardImage
+                  src={slab.card?.imageUrl || ''}
+                  alt={slab.card?.name || (slab.card as any)?.pokemonName || 'Card'}
+                  className="h-56 object-contain"
+                  containerClassName="h-56"
                 />
 
                 {/* Holographic Label */}
@@ -448,11 +450,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
               <div className="space-y-1 font-mono">
                 <div className="flex items-center justify-between">
-                  <span className="font-display font-bold text-base text-white">{slab.card.name}</span>
-                  <span className="text-xs text-cyan-300 font-bold">${slab.vaultValueCAD.toLocaleString()} CAD</span>
+                  <span className="font-display font-bold text-base text-white">{slab.card?.name || (slab.card as any)?.pokemonName || 'Unknown Card'}</span>
+                  <span className="text-xs text-cyan-300 font-bold">${(slab.vaultValueCAD || 0).toLocaleString()} CAD</span>
                 </div>
                 <div className="text-xs text-slate-400">
-                  {slab.card.set} • #{slab.card.number}
+                  {slab.card?.set || (slab.card as any)?.setName} • #{slab.card?.number || (slab.card as any)?.cardNumber}
                 </div>
               </div>
 

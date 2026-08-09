@@ -94,32 +94,32 @@ export const CardComparisonModal: React.FC<CardComparisonModalProps> = ({
               {/* Raw Price */}
               <tr>
                 <td className="p-4 font-bold text-slate-400">RAW VALUE (CAD)</td>
-                <td className="p-4 font-bold text-slate-100">${card1.rawPrice.toFixed(2)}</td>
-                <td className="p-4 font-bold text-slate-100">${card2.rawPrice.toFixed(2)}</td>
+                <td className="p-4 font-bold text-slate-100">${(card1.rawPrice || 0).toFixed(2)}</td>
+                <td className="p-4 font-bold text-slate-100">${(card2.rawPrice || 0).toFixed(2)}</td>
               </tr>
 
               {/* PSA 9 Price */}
               <tr>
                 <td className="p-4 font-bold text-slate-400">PSA 9 GRADED</td>
-                <td className="p-4 font-bold text-purple-300">${card1.psa9Price.toFixed(2)}</td>
-                <td className="p-4 font-bold text-purple-300">${card2.psa9Price.toFixed(2)}</td>
+                <td className="p-4 font-bold text-purple-300">${(card1.psa9Price || 0).toFixed(2)}</td>
+                <td className="p-4 font-bold text-purple-300">${(card2.psa9Price || 0).toFixed(2)}</td>
               </tr>
 
               {/* PSA 10 Price */}
               <tr>
                 <td className="p-4 font-bold text-slate-400">PSA 10 GEM MINT</td>
-                <td className="p-4 font-bold text-amber-300">${card1.psa10Price.toFixed(2)}</td>
-                <td className="p-4 font-bold text-amber-300">${card2.psa10Price.toFixed(2)}</td>
+                <td className="p-4 font-bold text-amber-300">${(card1.psa10Price || 0).toFixed(2)}</td>
+                <td className="p-4 font-bold text-amber-300">${(card2.psa10Price || 0).toFixed(2)}</td>
               </tr>
 
               {/* PSA 10 Multiplier over Raw */}
               <tr>
                 <td className="p-4 font-bold text-slate-400">PSA 10 MULTIPLIER</td>
                 <td className="p-4 font-bold text-emerald-400">
-                  {(card1.psa10Price / card1.rawPrice).toFixed(1)}x Raw
+                  {card1.rawPrice ? (card1.psa10Price / card1.rawPrice).toFixed(1) : '1.0'}x Raw
                 </td>
                 <td className="p-4 font-bold text-emerald-400">
-                  {(card2.psa10Price / card2.rawPrice).toFixed(1)}x Raw
+                  {card2.rawPrice ? (card2.psa10Price / card2.rawPrice).toFixed(1) : '1.0'}x Raw
                 </td>
               </tr>
 

@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { MOCK_AUCTIONS, MOCK_LISTINGS, MOCK_SLABS } from '../../mockData/cards';
 import { HolographicLabel } from '../HolographicLabel';
+import { HoloCardImage } from '../HoloCardImage';
 import { VCASlab } from '../../types';
 
 interface AuctionItem {
@@ -313,30 +314,37 @@ export const MarketplaceView: React.FC = () => {
 
               {/* Card info */}
               <div className="flex items-start gap-4">
-                <img
-                  src={auc.slab.card.imageUrl}
-                  alt={auc.slab.card.name}
-                  className="w-24 h-34 object-cover rounded-xl border border-slate-700 shadow-md shrink-0"
+                <HoloCardImage
+                  src={auc.slab?.card?.imageUrl || ''}
+                  alt={auc.slab?.card?.name || (auc.slab?.card as any)?.pokemonName || 'Card'}
+                  className="w-24 h-34 object-cover rounded-xl"
+                  containerClassName="shrink-0"
+                  onClick={() => {
+                    setBiddingAuction(auc);
+                    setBidAmount((auc.currentBidCAD || 0) + 25);
+                  }}
                 />
                 <div className="flex-1 min-w-0 space-y-2">
-                  <HolographicLabel
-                    grade={auc.slab.overallGrade}
-                    gradeText={auc.slab.gradeLabel}
-                    serialNumber={auc.slab.serialNumber}
-                    size="sm"
-                  />
+                  {auc.slab && (
+                    <HolographicLabel
+                      grade={auc.slab.overallGrade}
+                      gradeText={auc.slab.gradeLabel}
+                      serialNumber={auc.slab.serialNumber}
+                      size="sm"
+                    />
+                  )}
                   <h3 className="font-display font-black text-lg text-slate-100 truncate mt-1">
-                    {auc.slab.card.name}
+                    {auc.slab?.card?.name || (auc.slab?.card as any)?.pokemonName || 'Unknown Card'}
                   </h3>
                   <div className="text-xs font-mono text-slate-400 truncate">
-                    {auc.slab.card.set} • #{auc.slab.card.number}
+                    {auc.slab?.card?.set || (auc.slab?.card as any)?.setName} • #{auc.slab?.card?.number || (auc.slab?.card as any)?.cardNumber}
                   </div>
 
                   <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
                     <div>
                       <div className="text-[10px] font-mono text-slate-400">CURRENT HIGH BID</div>
                       <div className="text-xl font-mono font-black text-amber-300">
-                        CAD ${auc.currentBidCAD.toLocaleString()}
+                        CAD ${(auc.currentBidCAD || 0).toLocaleString()}
                       </div>
                     </div>
                     <div className="text-right">
@@ -386,17 +394,22 @@ export const MarketplaceView: React.FC = () => {
               />
 
               <div className="flex items-start gap-4">
-                <img src={item.slab.card.imageUrl} alt={item.slab.card.name} className="w-20 h-28 object-cover rounded-xl border border-slate-700 shrink-0" />
+                <HoloCardImage
+                  src={item.slab?.card?.imageUrl || ''}
+                  alt={item.slab?.card?.name || (item.slab?.card as any)?.pokemonName || 'Card'}
+                  className="w-20 h-28 object-cover rounded-xl"
+                  containerClassName="shrink-0"
+                />
                 <div className="flex-1 min-w-0 space-y-1">
-                  <h3 className="font-display font-bold text-base text-slate-100 truncate">{item.slab.card.name}</h3>
-                  <div className="text-xs font-mono text-slate-400 truncate">{item.slab.card.set}</div>
+                  <h3 className="font-display font-bold text-base text-slate-100 truncate">{item.slab?.card?.name || (item.slab?.card as any)?.pokemonName || 'Unknown Card'}</h3>
+                  <div className="text-xs font-mono text-slate-400 truncate">{item.slab?.card?.set || (item.slab?.card as any)?.setName}</div>
                   <div className="text-xs font-mono text-slate-400">Seller: <span className="text-cyan-300">{item.sellerName}</span></div>
-                  <div className="text-xl font-mono font-black text-emerald-400 pt-2">CAD ${item.priceCAD.toLocaleString()}</div>
+                  <div className="text-xl font-mono font-black text-emerald-400 pt-2">CAD ${(item.priceCAD || 0).toLocaleString()}</div>
                 </div>
               </div>
 
               <button
-                onClick={() => alert(`Purchased ${item.slab.card.name} for $${item.priceCAD} CAD! Slab moved to your Vault.`)}
+                onClick={() => alert(`Purchased ${item.slab?.card?.name || 'Card'} for $${item.priceCAD} CAD! Slab moved to your Vault.`)}
                 className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-display font-extrabold text-xs tracking-wider cursor-pointer"
               >
                 BUY NOW WITH VCA ESCROW
@@ -432,10 +445,11 @@ export const MarketplaceView: React.FC = () => {
               <div key={mSet.id} className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4 hover:border-purple-500/40 transition-all">
                 
                 <div className="flex flex-col sm:flex-row items-start gap-4">
-                  <img
+                  <HoloCardImage
                     src={mSet.imageUrl}
                     alt={mSet.title}
-                    className="w-32 h-44 object-cover rounded-xl border border-purple-500/30 shadow-lg shrink-0 self-center sm:self-start"
+                    className="w-32 h-44 object-cover rounded-xl"
+                    containerClassName="shrink-0 self-center sm:self-start"
                   />
                   <div className="flex-1 space-y-2">
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[10px] font-mono font-bold uppercase">
@@ -477,7 +491,7 @@ export const MarketplaceView: React.FC = () => {
                   <div>
                     <div className="text-[10px] font-mono text-slate-400 uppercase">DIRECT WHOLESALE PRICE</div>
                     <div className="text-2xl font-mono font-black text-purple-300">
-                      CAD ${mSet.priceCAD.toLocaleString()}
+                      CAD ${(mSet.priceCAD || 0).toLocaleString()}
                     </div>
                   </div>
 
@@ -675,7 +689,7 @@ export const MarketplaceView: React.FC = () => {
                 <div className="text-slate-400">Supplier: <span className="text-cyan-300">{selectedSetToBuy.supplierName}</span></div>
                 <div className="flex justify-between border-t border-slate-800 pt-2 text-sm font-black">
                   <span className="text-slate-300">TOTAL PRICE:</span>
-                  <span className="text-purple-300">CAD ${selectedSetToBuy.priceCAD.toLocaleString()}</span>
+                  <span className="text-purple-300">CAD ${(selectedSetToBuy.priceCAD || 0).toLocaleString()}</span>
                 </div>
               </div>
 

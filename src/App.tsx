@@ -20,6 +20,7 @@ import { FoilbookView } from './components/Views/FoilbookView';
 import { ProfileView } from './components/Views/ProfileView';
 import { LedgerView } from './components/Views/LedgerView';
 import { AdminView } from './components/Views/AdminView';
+import { Card3DShowcaseView } from './components/Views/Card3DShowcaseView';
 
 import { CardItem, VCASlab } from './types';
 import { SAMPLE_CARDS } from './mockData/cards';
@@ -75,6 +76,13 @@ export function App() {
       {/* Main Body View Switching */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 pt-4">
         <div key={currentView} className="glitch-wipe-enter bg-hud-grid py-2 min-h-[80vh] rounded-2xl">
+          {currentView === 'card3d' && (
+            <Card3DShowcaseView
+              onOpenNfcModal={(slab) => { setSelectedNfcSlab(slab as any); setShowNfcModal(true); }}
+              onToast={(m) => showToast(m)}
+            />
+          )}
+
           {currentView === 'home' && (
             <HomeView
               onNavigate={(v) => setCurrentView(v)}

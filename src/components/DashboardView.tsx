@@ -46,12 +46,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   // Portfolio calculations
   const totalValue = portfolio.reduce((sum, item) => {
+    if (!item?.card?.market) return sum;
     const cardVal = item.isGraded && item.userGrade === 10
-      ? item.card.market.psa10PriceUSD
+      ? (item.card.market.psa10PriceUSD || 0)
       : item.isGraded && item.userGrade === 9
-      ? item.card.market.psa9PriceUSD
-      : item.card.market.rawPriceUSD;
-    return sum + cardVal * item.quantity;
+      ? (item.card.market.psa9PriceUSD || 0)
+      : (item.card.market.rawPriceUSD || 0);
+    return sum + cardVal * (item.quantity || 1);
   }, 0);
 
   const totalCostBasis = portfolio.reduce((sum, item) => sum + item.purchasePriceUSD * item.quantity, 0);
@@ -141,8 +142,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               >
                 <div className="relative flex justify-center mb-2">
                   <img
-                    src={item.card.imageUrl}
-                    alt={item.card.pokemonName}
+                    src={item.card?.imageUrl || ''}
+                    alt={item.card?.pokemonName || (item.card as any)?.name || 'Card'}
                     className="h-36 object-contain rounded-lg group-hover:scale-105 transition-transform"
                   />
                   {item.isGraded && (
@@ -153,12 +154,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <div className="font-bold text-xs text-white truncate">{item.card.pokemonName}</div>
-                  <div className="text-[10px] font-mono text-slate-400 truncate">{item.card.setName} #{item.card.cardNumber}</div>
+                  <div className="font-bold text-xs text-white truncate">{item.card?.pokemonName || (item.card as any)?.name || 'Unknown Card'}</div>
+                  <div className="text-[10px] font-mono text-slate-400 truncate">{item.card?.setName || (item.card as any)?.set || ''} #{item.card?.cardNumber || (item.card as any)?.number || ''}</div>
                   <div className="flex items-center justify-between pt-2 border-t border-slate-800 font-mono text-xs">
                     <span className="text-slate-500">Value:</span>
                     <span className="font-bold text-cyan-300">
-                      ${(item.isGraded && item.userGrade === 10 ? item.card.market.psa10PriceUSD : item.card.market.rawPriceUSD).toLocaleString()}
+                      ${((item.isGraded && item.userGrade === 10 ? item.card?.market?.psa10PriceUSD : item.card?.market?.rawPriceUSD) || 0).toLocaleString()}
                     </span>
                   </div>
                 </div>

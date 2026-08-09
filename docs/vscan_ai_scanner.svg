@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#030712"/>
+      <stop offset="50%" stop-color="#0b132b"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </linearGradient>
+    <linearGradient id="hudCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#bg)"/>
+
+  <!-- Scanning Reticle Frame -->
+  <rect x="350" y="80" width="500" height="515" rx="20" fill="#030712" stroke="#06b6d4" stroke-width="2" opacity="0.9" filter="url(#glow)"/>
+  
+  <!-- HUD Corner Marks -->
+  <path d="M 370 120 L 370 100 L 390 100" fill="none" stroke="#22d3ee" stroke-width="4"/>
+  <path d="M 830 120 L 830 100 L 810 100" fill="none" stroke="#22d3ee" stroke-width="4"/>
+  <path d="M 370 555 L 370 575 L 390 575" fill="none" stroke="#22d3ee" stroke-width="4"/>
+  <path d="M 830 555 L 830 575 L 810 575" fill="none" stroke="#22d3ee" stroke-width="4"/>
+
+  <!-- Card Placeholder in Center -->
+  <rect x="420" y="130" width="360" height="415" rx="14" fill="#0f172a" stroke="#334155" stroke-width="2"/>
+  <text x="600" y="260" text-anchor="middle" font-family="'Orbitron', sans-serif" font-weight="900" font-size="32" fill="#fbbf24" filter="url(#glow)">🔥 CHARIZARD</text>
+  <text x="600" y="295" text-anchor="middle" font-family="monospace" font-size="16" fill="#38bdf8">Base Set 1st Edition #4/102</text>
+  
+  <!-- Laser Scanline -->
+  <rect x="360" y="310" width="480" height="4" fill="url(#hudCyan)" filter="url(#glow)"/>
+  <polygon points="360,312 840,312 800,340 400,340" fill="#06b6d4" opacity="0.15"/>
+
+  <!-- AI Analysis Badges Left -->
+  <g transform="translate(60, 140)">
+    <rect x="0" y="0" width="250" height="80" rx="10" fill="#0f172a" stroke="#06b6d4" stroke-width="1"/>
+    <text x="20" y="30" font-family="monospace" font-size="12" fill="#22d3ee">CENTERING METRICS</text>
+    <text x="20" y="58" font-family="'Orbitron', sans-serif" font-weight="700" font-size="20" fill="#10b981">98.4 / 100 (GEM)</text>
+  </g>
+
+  <g transform="translate(60, 250)">
+    <rect x="0" y="0" width="250" height="80" rx="10" fill="#0f172a" stroke="#a855f7" stroke-width="1"/>
+    <text x="20" y="30" font-family="monospace" font-size="12" fill="#c084fc">SURFACE &amp; FOIL SCAN</text>
+    <text x="20" y="58" font-family="'Orbitron', sans-serif" font-weight="700" font-size="20" fill="#f43f5e">0 Defect Flags</text>
+  </g>
+
+  <g transform="translate(60, 360)">
+    <rect x="0" y="0" width="250" height="80" rx="10" fill="#0f172a" stroke="#eab308" stroke-width="1"/>
+    <text x="20" y="30" font-family="monospace" font-size="12" fill="#fde047">PROJECTED VGAS GRADE</text>
+    <text x="20" y="58" font-family="'Orbitron', sans-serif" font-weight="700" font-size="20" fill="#fbbf24">10.0 GEM MINT</text>
+  </g>
+
+  <!-- Market Prices Right -->
+  <g transform="translate(890, 140)">
+    <rect x="0" y="0" width="250" height="300" rx="12" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+    <text x="25" y="35" font-family="'Orbitron', sans-serif" font-weight="700" font-size="14" fill="#ffffff">REAL MARKET COMPS</text>
+    
+    <text x="25" y="80" font-family="sans-serif" font-size="12" fill="#94a3b8">RAW MARKET</text>
+    <text x="25" y="105" font-family="monospace" font-weight="700" font-size="22" fill="#cbd5e1">$1,850 CAD</text>
+
+    <text x="25" y="150" font-family="sans-serif" font-size="12" fill="#94a3b8">PSA 9 MINT</text>
+    <text x="25" y="175" font-family="monospace" font-weight="700" font-size="22" fill="#38bdf8">$4,200 CAD</text>
+
+    <text x="25" y="220" font-family="sans-serif" font-size="12" fill="#94a3b8">PSA 10 GEM MINT</text>
+    <text x="25" y="245" font-family="monospace" font-weight="700" font-size="22" fill="#10b981">$9,850 CAD</text>
+  </g>
+
+  <!-- Bottom CTA Bar -->
+  <rect x="350" y="610" width="500" height="40" rx="20" fill="#0284c7"/>
+  <text x="600" y="635" text-anchor="middle" font-family="'Orbitron', sans-serif" font-weight="700" font-size="14" fill="#ffffff">CONFIRM &amp; MINT NTAG424 SMART SLAB</text>
+</svg>

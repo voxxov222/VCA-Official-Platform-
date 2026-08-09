@@ -210,22 +210,22 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({ onOpenScanner, onS
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {watchlist.map(item => {
-                const isUnderTarget = item.card.market.rawPriceUSD <= item.targetPriceUSD;
+                const isUnderTarget = item.card?.market ? item.card.market.rawPriceUSD <= item.targetPriceUSD : false;
                 return (
                   <div key={item.id} className="glass-panel p-5 rounded-3xl border border-slate-800 space-y-4 relative group">
                     <div className="flex gap-4">
                       <img
-                        src={item.card.imageUrl}
-                        alt={item.card.pokemonName}
+                        src={item.card?.imageUrl || ''}
+                        alt={item.card?.pokemonName || (item.card as any)?.name || 'Card'}
                         className="w-20 h-28 object-cover rounded-xl border border-amber-500/30 shadow-lg shrink-0"
                       />
                       <div className="space-y-1 min-w-0 flex-1">
                         <div className="flex items-center justify-between">
                           <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">
-                            {item.card.variant}
+                            {item.card?.variant}
                           </span>
                           <button
-                            onClick={() => handleRemoveItem(item.id, item.card.pokemonName)}
+                            onClick={() => handleRemoveItem(item.id, item.card?.pokemonName || (item.card as any)?.name || '')}
                             className="text-slate-500 hover:text-rose-400 p-1 cursor-pointer"
                             title="Remove from watchlist"
                           >
@@ -234,17 +234,17 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({ onOpenScanner, onS
                         </div>
 
                         <div className="font-display font-bold text-sm text-white truncate">
-                          {item.card.pokemonName}
+                          {item.card?.pokemonName || (item.card as any)?.name || 'Unknown Card'}
                         </div>
                         <div className="text-xs text-slate-400 truncate">
-                          {item.card.setName} • #{item.card.cardNumber}
+                          {item.card?.setName || (item.card as any)?.set} • #{item.card?.cardNumber || (item.card as any)?.number}
                         </div>
 
                         {/* Price & Target */}
                         <div className="pt-2 space-y-0.5 text-xs">
                           <div className="flex justify-between">
                             <span className="text-slate-400">Current Raw:</span>
-                            <span className="font-bold text-white">${item.card.market.rawPriceUSD.toFixed(2)} USD</span>
+                            <span className="font-bold text-white">${(item.card?.market?.rawPriceUSD || 0).toFixed(2)} USD</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-400">Target Trigger:</span>

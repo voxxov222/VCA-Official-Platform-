@@ -158,19 +158,19 @@ export const NfcModal: React.FC<NfcModalProps> = ({
             {/* Slab summary card */}
             <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center gap-4">
               <img
-                src={targetSlab.card.imageUrl}
-                alt={targetSlab.card.name}
+                src={targetSlab.card?.imageUrl || ''}
+                alt={targetSlab.card?.name || (targetSlab.card as any)?.pokemonName || 'Card'}
                 className="w-16 h-22 object-cover rounded-lg border border-slate-700 shadow-md shrink-0"
               />
               <div className="flex-1 min-w-0 space-y-1">
                 <div className="font-display font-extrabold text-sm text-slate-100 truncate">
-                  {targetSlab.card.name}
+                  {targetSlab.card?.name || (targetSlab.card as any)?.pokemonName || 'Unknown Card'}
                 </div>
                 <div className="text-xs text-slate-400 font-mono truncate">
-                  {targetSlab.card.set} • #{targetSlab.card.number}
+                  {targetSlab.card?.set || (targetSlab.card as any)?.setName} • #{targetSlab.card?.number || (targetSlab.card as any)?.cardNumber}
                 </div>
                 <div className="text-xs font-mono text-emerald-400 font-bold">
-                  Est. CAD ${targetSlab.vaultValueCAD.toLocaleString()}
+                  Est. CAD ${(targetSlab.vaultValueCAD || 0).toLocaleString()}
                 </div>
                 <div className="pt-1">
                   <HolographicLabel

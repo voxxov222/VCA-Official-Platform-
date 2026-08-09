@@ -58,12 +58,12 @@ export const MarketMatrix: React.FC<MarketMatrixProps> = ({ card }) => {
             <span className="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] text-slate-300 font-bold">{selectedCondition}</span>
           </div>
           <div className="text-2xl font-mono font-black text-slate-100 mt-2">
-            CAD ${currentConditionPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            CAD ${(currentConditionPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className="text-[11px] text-slate-400 mt-1 flex items-center justify-between">
             <span>Market Range:</span>
             <span className="text-slate-300 font-mono">
-              ${Math.round(currentConditionPrice * 0.88)} – ${Math.round(currentConditionPrice * 1.15)}
+              ${Math.round((currentConditionPrice || 0) * 0.88)} – ${Math.round((currentConditionPrice || 0) * 1.15)}
             </span>
           </div>
         </div>
@@ -75,11 +75,11 @@ export const MarketMatrix: React.FC<MarketMatrixProps> = ({ card }) => {
             <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold">MINT</span>
           </div>
           <div className="text-2xl font-mono font-black text-purple-300 mt-2">
-            CAD ${card.psa9Price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            CAD ${(card.psa9Price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1 font-mono font-bold">
             <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>+${(card.psa9Price - currentConditionPrice).toLocaleString()} (+{Math.round(((card.psa9Price - currentConditionPrice) / currentConditionPrice) * 100)}% over raw)</span>
+            <span>+${((card.psa9Price || 0) - (currentConditionPrice || 0)).toLocaleString()} (+{currentConditionPrice ? Math.round((((card.psa9Price || 0) - currentConditionPrice) / currentConditionPrice) * 100) : 0}% over raw)</span>
           </div>
         </div>
 
@@ -90,11 +90,11 @@ export const MarketMatrix: React.FC<MarketMatrixProps> = ({ card }) => {
             <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">GEM MINT</span>
           </div>
           <div className="text-2xl font-mono font-black text-amber-300 mt-2">
-            CAD ${card.psa10Price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            CAD ${(card.psa10Price || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className="text-[11px] text-amber-400 mt-1 flex items-center gap-1 font-mono font-bold">
             <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>+${(card.psa10Price - currentConditionPrice).toLocaleString()} (+{Math.round(((card.psa10Price - currentConditionPrice) / currentConditionPrice) * 100)}% over raw)</span>
+            <span>+${((card.psa10Price || 0) - (currentConditionPrice || 0)).toLocaleString()} (+{currentConditionPrice ? Math.round((((card.psa10Price || 0) - currentConditionPrice) / currentConditionPrice) * 100) : 0}% over raw)</span>
           </div>
         </div>
       </div>

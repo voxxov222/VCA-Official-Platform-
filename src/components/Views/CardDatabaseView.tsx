@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Layers, Camera, ArrowRight, Filter } from 'lucide-react';
 import { SAMPLE_CARDS } from '../../mockData/cards';
+import { HoloCardImage } from '../HoloCardImage';
 import { CardItem } from '../../types';
 
 interface CardDatabaseViewProps {
@@ -61,7 +62,12 @@ export const CardDatabaseView: React.FC<CardDatabaseViewProps> = ({
             onClick={() => onSelectCard(card)}
             className="glass-panel p-4 rounded-2xl border border-slate-800 hover:border-cyan-500/40 transition-all cursor-pointer space-y-3"
           >
-            <img src={card.imageUrl} alt={card.name} className="w-full h-48 object-cover rounded-xl border border-slate-700 shadow-md" />
+            <HoloCardImage
+              src={card.imageUrl}
+              alt={card.name}
+              className="w-full h-48 object-cover rounded-xl"
+              containerClassName="w-full"
+            />
             <div>
               <div className="font-display font-bold text-sm text-slate-100 truncate">{card.name}</div>
               <div className="text-xs font-mono text-slate-400 truncate">{card.set} • #{card.number}</div>

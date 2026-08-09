@@ -6,6 +6,7 @@ import {
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, PieChart as RePieChart, Pie, Cell } from 'recharts';
 import { DEMO_USER, MOCK_SLABS, PORTFOLIO_HISTORY, SAMPLE_CARDS } from '../../mockData/cards';
 import { HolographicLabel } from '../HolographicLabel';
+import { HoloCardImage } from '../HoloCardImage';
 import { VCASlab, CardItem } from '../../types';
 
 interface DashboardViewProps {
@@ -66,7 +67,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="p-5 rounded-2xl glass-panel border border-slate-800 space-y-1">
           <div className="text-xs font-mono text-slate-400">TOTAL VAULT VALUE (CAD)</div>
           <div className="text-2xl font-mono font-black text-slate-100">
-            ${DEMO_USER.vaultValueCAD.toLocaleString('en-CA', { minimumFractionDigits: 2 })}
+            ${(DEMO_USER?.vaultValueCAD || 0).toLocaleString('en-CA', { minimumFractionDigits: 2 })}
           </div>
           <div className="text-[11px] font-mono text-emerald-400 flex items-center gap-1 font-bold pt-1">
             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -133,7 +134,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <YAxis stroke="#64748b" fontSize={10} fontFamily="JetBrains Mono" domain={['auto', 'auto']} />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#05070a', borderColor: '#22d3ee', borderRadius: '12px', fontSize: '12px', fontFamily: 'JetBrains Mono' }}
-                  formatter={(val: number) => [`$${val.toLocaleString()} CAD`, 'Vault Value']}
+                  formatter={(val: number) => [`$${(val || 0).toLocaleString()} CAD`, 'Vault Value']}
                 />
                 <Area type="monotone" dataKey="valueCAD" stroke="#22d3ee" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
               </AreaChart>
@@ -174,7 +175,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
                   <span className="text-slate-300 truncate max-w-[140px]">{item.name}</span>
                 </div>
-                <span className="text-slate-100 font-bold">${item.value.toLocaleString()}</span>
+                <span className="text-slate-100 font-bold">${(item.value || 0).toLocaleString()}</span>
               </div>
             ))}
           </div>
@@ -203,20 +204,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div key={slab.serialNumber} className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4 hover:border-cyan-500/40 transition-all">
               
               <div className="flex items-start gap-4">
-                <img
-                  src={slab.card.imageUrl}
-                  alt={slab.card.name}
-                  className="w-20 h-28 object-cover rounded-xl border border-slate-700 shadow-md shrink-0"
+                <HoloCardImage
+                  src={slab.card?.imageUrl || ''}
+                  alt={slab.card?.name || (slab.card as any)?.pokemonName || 'Card'}
+                  className="w-20 h-28 object-cover rounded-xl"
+                  containerClassName="shrink-0"
                 />
                 <div className="flex-1 min-w-0 space-y-1">
                   <div className="font-display font-black text-base text-slate-100 truncate">
-                    {slab.card.name}
+                    {slab.card?.name || (slab.card as any)?.pokemonName || 'Unknown Card'}
                   </div>
                   <div className="text-xs font-mono text-slate-400 truncate">
-                    {slab.card.set} • #{slab.card.number}
+                    {slab.card?.set || (slab.card as any)?.setName} • #{slab.card?.number || (slab.card as any)?.cardNumber}
                   </div>
                   <div className="text-xs font-mono text-emerald-400 font-bold pt-1">
-                    CAD ${slab.vaultValueCAD.toLocaleString()}
+                    CAD ${(slab.vaultValueCAD || 0).toLocaleString()}
                   </div>
                   <div className="pt-1">
                     <HolographicLabel

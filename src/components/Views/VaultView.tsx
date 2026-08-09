@@ -6,6 +6,7 @@ import {
 import { MOCK_SLABS } from '../../mockData/cards';
 import { HolographicLabel } from '../HolographicLabel';
 import { Slab3DCanvas } from '../Slab3DCanvas';
+import { HoloCardImage } from '../HoloCardImage';
 import { VCASlab } from '../../types';
 
 interface VaultViewProps {
@@ -89,28 +90,30 @@ export const VaultView: React.FC<VaultViewProps> = ({ onOpenNfcModal }) => {
 
             {/* Card Content Body */}
             <div className="flex items-start gap-4">
-              <img
-                src={slab.card.imageUrl}
-                alt={slab.card.name}
-                className="w-24 h-34 object-cover rounded-xl border border-slate-700 shadow-lg shrink-0 group-hover:scale-105 transition-transform"
+              <HoloCardImage
+                src={slab.card?.imageUrl || ''}
+                alt={slab.card?.name || (slab.card as any)?.pokemonName || 'Card'}
+                className="w-24 h-34 object-cover rounded-xl"
+                containerClassName="shrink-0"
+                onClick={() => setActiveSlab(slab)}
               />
               <div className="flex-1 min-w-0 space-y-2">
                 <div>
                   <h3 className="font-display font-black text-base text-slate-100 truncate">
-                    {slab.card.name}
+                    {slab.card?.name || (slab.card as any)?.pokemonName || 'Unknown Card'}
                   </h3>
                   <div className="text-xs font-mono text-slate-400 truncate">
-                    {slab.card.set} • #{slab.card.number}
+                    {slab.card?.set || (slab.card as any)?.setName} • #{slab.card?.number || (slab.card as any)?.cardNumber}
                   </div>
                   <div className="text-[11px] font-mono text-purple-300 truncate font-semibold">
-                    {slab.card.variant}
+                    {slab.card?.variant}
                   </div>
                 </div>
 
                 <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
                   <div className="text-[10px] font-mono text-slate-400">CURRENT VAULT VALUE</div>
                   <div className="text-base font-mono font-black text-emerald-400">
-                    CAD ${slab.vaultValueCAD.toLocaleString()}
+                    CAD ${(slab.vaultValueCAD || 0).toLocaleString()}
                   </div>
                 </div>
               </div>

@@ -64,6 +64,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <Cpu className="w-4 h-4 text-purple-400" />
                 <span>SIMULATE NFC SLAB TAP</span>
               </button>
+
+              <button
+                onClick={() => onNavigate('card3d')}
+                className="px-6 py-4 rounded-2xl bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-400/40 text-cyan-300 font-mono font-bold text-xs tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+              >
+                <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
+                <span>3D POP-OUT STUDIO</span>
+              </button>
             </div>
 
             {/* Micro proof metrics */}

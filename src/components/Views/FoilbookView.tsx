@@ -504,13 +504,13 @@ export const FoilbookView: React.FC = () => {
                             </button>
                           </div>
                           <div className="flex p-4 gap-4 items-center relative z-0">
-                            <img src={post.slab.card.imageUrl} alt={post.slab.card.name} className="w-24 h-auto object-contain rounded-lg shadow-2xl drop-shadow-[0_0_15px_rgba(34,211,238,0.2)]" />
+                            <img src={post.slab?.card?.imageUrl || ''} alt={post.slab?.card?.name || (post.slab?.card as any)?.pokemonName || 'Card'} className="w-24 h-auto object-contain rounded-lg shadow-2xl drop-shadow-[0_0_15px_rgba(34,211,238,0.2)]" />
                             <div>
-                              <div className="font-display font-black text-lg text-white mb-1">{post.slab.card.name}</div>
-                              <div className="text-xs font-mono text-cyan-300 font-bold mb-2">Grade #{post.slab.overallGrade} • {post.slab.serialNumber}</div>
+                              <div className="font-display font-black text-lg text-white mb-1">{post.slab?.card?.name || (post.slab?.card as any)?.pokemonName || 'Unknown Card'}</div>
+                              <div className="text-xs font-mono text-cyan-300 font-bold mb-2">Grade #{post.slab?.overallGrade} • {post.slab?.serialNumber}</div>
                               <div className="flex flex-wrap gap-2">
-                                <span className="px-2 py-1 rounded bg-slate-800 text-[10px] font-mono text-slate-300">{post.slab.card.setName}</span>
-                                <span className="px-2 py-1 rounded bg-slate-800 text-[10px] font-mono text-slate-300">{post.slab.card.rarity}</span>
+                                <span className="px-2 py-1 rounded bg-slate-800 text-[10px] font-mono text-slate-300">{post.slab?.card?.setName || (post.slab?.card as any)?.set}</span>
+                                <span className="px-2 py-1 rounded bg-slate-800 text-[10px] font-mono text-slate-300">{post.slab?.card?.rarity}</span>
                               </div>
                             </div>
                           </div>
