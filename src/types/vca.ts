@@ -257,6 +257,13 @@ export interface UserProfile {
   email: string;
   displayName: string;
   avatarUrl: string;
+  handle?: string;
+  bio?: string;
+  location?: string;
+  favoritePokemon?: string;
+  coverUrl?: string;
+  followersCount?: number;
+  followingCount?: number;
   role: 'COLLECTOR' | 'VERIFIED_PRO' | 'ADMIN';
   verifiedTraderBadge: boolean;
   joinedDate: string;

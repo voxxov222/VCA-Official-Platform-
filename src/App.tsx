@@ -73,77 +73,79 @@ export function App() {
       )}
 
       {/* Main Body View Switching */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 pt-6">
-        {currentView === 'home' && (
-          <HomeView
-            onNavigate={(v) => setCurrentView(v)}
-            onOpenScanner={() => setShowScanner(true)}
-            onOpenNfcModal={() => { setSelectedNfcSlab(undefined); setShowNfcModal(true); }}
-          />
-        )}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 pt-4">
+        <div key={currentView} className="glitch-wipe-enter bg-hud-grid py-2 min-h-[80vh] rounded-2xl">
+          {currentView === 'home' && (
+            <HomeView
+              onNavigate={(v) => setCurrentView(v)}
+              onOpenScanner={() => setShowScanner(true)}
+              onOpenNfcModal={() => { setSelectedNfcSlab(undefined); setShowNfcModal(true); }}
+            />
+          )}
 
-        {currentView === 'dashboard' && (
-          <DashboardView
-            onNavigate={(v) => setCurrentView(v)}
-            onOpenScanner={() => setShowScanner(true)}
-            onOpenNfcModal={(slab) => { setSelectedNfcSlab(slab); setShowNfcModal(true); }}
-          />
-        )}
+          {currentView === 'dashboard' && (
+            <DashboardView
+              onNavigate={(v) => setCurrentView(v)}
+              onOpenScanner={() => setShowScanner(true)}
+              onOpenNfcModal={(slab) => { setSelectedNfcSlab(slab); setShowNfcModal(true); }}
+            />
+          )}
 
-        {currentView === 'vault' && (
-          <VaultView
-            onOpenNfcModal={(slab) => { setSelectedNfcSlab(slab); setShowNfcModal(true); }}
-          />
-        )}
+          {currentView === 'vault' && (
+            <VaultView
+              onOpenNfcModal={(slab) => { setSelectedNfcSlab(slab); setShowNfcModal(true); }}
+            />
+          )}
 
-        {currentView === 'marketplace' && (
-          <MarketplaceView />
-        )}
+          {currentView === 'marketplace' && (
+            <MarketplaceView />
+          )}
 
-        {currentView === 'market-intelligence' && (
-          <MarketIntelligenceView />
-        )}
+          {currentView === 'market-intelligence' && (
+            <MarketIntelligenceView />
+          )}
 
-        {currentView === 'watchlist' && (
-          <WatchlistView
-            onOpenScanner={() => setShowScanner(true)}
-            onToast={(m) => showToast(m)}
-          />
-        )}
+          {currentView === 'watchlist' && (
+            <WatchlistView
+              onOpenScanner={() => setShowScanner(true)}
+              onToast={(m) => showToast(m)}
+            />
+          )}
 
-        {currentView === 'database' && (
-          <CardDatabaseView
-            onOpenScanner={() => setShowScanner(true)}
-            onSelectCard={(c) => { setCompareCard(c); }}
-          />
-        )}
+          {currentView === 'database' && (
+            <CardDatabaseView
+              onOpenScanner={() => setShowScanner(true)}
+              onSelectCard={(c) => { setCompareCard(c); }}
+            />
+          )}
 
-        {currentView === 'foilbook' && (
-          <FoilbookView />
-        )}
+          {currentView === 'foilbook' && (
+            <FoilbookView />
+          )}
 
-        {currentView === 'profile' && (
-          <ProfileView
-            onNavigate={(v) => setCurrentView(v)}
-            onOpenNfcModal={(slab) => { setSelectedNfcSlab(slab); setShowNfcModal(true); }}
-            onToast={(m) => showToast(m)}
-          />
-        )}
+          {currentView === 'profile' && (
+            <ProfileView
+              onNavigate={(v) => setCurrentView(v)}
+              onOpenNfcModal={(slab) => { setSelectedNfcSlab(slab); setShowNfcModal(true); }}
+              onToast={(m) => showToast(m)}
+            />
+          )}
 
-        {currentView === 'ledger' && (
-          <LedgerView />
-        )}
+          {currentView === 'ledger' && (
+            <LedgerView />
+          )}
 
-        {currentView === 'admin' && (
-          <AdminView />
-        )}
+          {currentView === 'admin' && (
+            <AdminView />
+          )}
 
-        {currentView === 'compare' && (
-          <CardComparisonModal
-            initialCard={compareCard || SAMPLE_CARDS[0]}
-            onClose={() => setCurrentView('home')}
-          />
-        )}
+          {currentView === 'compare' && (
+            <CardComparisonModal
+              initialCard={compareCard || SAMPLE_CARDS[0]}
+              onClose={() => setCurrentView('home')}
+            />
+          )}
+        </div>
       </main>
 
       {/* MODALS */}

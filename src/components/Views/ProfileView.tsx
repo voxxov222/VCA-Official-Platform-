@@ -62,7 +62,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       setUser(u);
       if (u) {
         setDisplayName(u.displayName || 'Alex Vance');
+        setUsername(u.handle || '@alexvance_vca');
+        setBio(u.bio || 'Pokémon TCG collector & VCA Gem Mint enthusiast. Hunting Base Set Charizards & 151 SIRs.');
+        setLocation(u.location || 'Vancouver, BC / Tokyo, JP');
+        setFavoritePokemon(u.favoritePokemon || 'Charizard');
         setAvatarPreview(u.avatarUrl || '');
+        setCoverPreview(u.coverUrl || '');
       }
     });
     return unsub;
@@ -79,10 +84,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     }
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const base64 = event.target?.result as string;
       setAvatarPreview(base64);
-      if (onToast) onToast('Profile picture preview updated!');
+      await updateUserProfile({ avatarUrl: base64 });
+      if (onToast) onToast('Profile picture updated & synced across VCA and Foilbook!');
     };
     reader.readAsDataURL(file);
   };
@@ -93,10 +99,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const base64 = event.target?.result as string;
       setCoverPreview(base64);
-      if (onToast) onToast('Cover banner updated!');
+      await updateUserProfile({ coverUrl: base64 });
+      if (onToast) onToast('Cover banner updated & synced across VCA and Foilbook!');
     };
     reader.readAsDataURL(file);
   };
@@ -106,11 +113,16 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     try {
       const updated = await updateUserProfile({
         displayName: displayName || user?.displayName || 'Collector',
-        avatarUrl: avatarPreview || user?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+        handle: username || user?.handle || '@alexvance',
+        bio: bio || user?.bio || '',
+        location: location || user?.location || '',
+        favoritePokemon: favoritePokemon || user?.favoritePokemon || 'Charizard',
+        avatarUrl: avatarPreview || user?.avatarUrl || '',
+        coverUrl: coverPreview || user?.coverUrl || ''
       });
       setUser(updated);
       setIsEditing(false);
-      if (onToast) onToast('Profile details & avatar updated successfully!');
+      if (onToast) onToast('Profile details synchronized across VCA and Foilbook!');
     } catch (err) {
       if (onToast) onToast('Failed to save profile changes.');
     }

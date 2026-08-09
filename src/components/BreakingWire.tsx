@@ -31,13 +31,8 @@ export const BreakingWire: React.FC<BreakingWireProps> = ({ onOpenNewsModal }) =
         <div 
           className="flex-1 overflow-hidden relative cursor-pointer"
           onClick={onOpenNewsModal}
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
         >
-          <div 
-            className={`flex items-center gap-8 whitespace-nowrap transition-transform ${isPaused ? '' : 'animate-[marquee_30s_linear_infinite]'}`}
-            style={{ animationPlayState: isPaused ? 'paused' : 'running' }}
-          >
+          <div className="animate-marquee-infinite gap-8 whitespace-nowrap py-0.5">
             {BREAKING_NEWS_ITEMS.concat(BREAKING_NEWS_ITEMS).map((item, index) => {
               const getIcon = () => {
                 switch (item.type) {
@@ -50,10 +45,10 @@ export const BreakingWire: React.FC<BreakingWireProps> = ({ onOpenNewsModal }) =
               };
 
               return (
-                <div key={`${item.id}-${index}`} className="inline-flex items-center gap-2 text-slate-300 hover:text-cyan-200 transition-colors">
+                <div key={`${item.id}-${index}`} className="inline-flex items-center gap-2 text-slate-300 hover:text-cyan-200 transition-colors pr-8">
                   {getIcon()}
                   <span className="text-[11px] font-medium tracking-tight">{item.text}</span>
-                  <span className="text-slate-600 font-sans">•</span>
+                  <span className="text-slate-600 font-sans ml-2">•</span>
                 </div>
               );
             })}

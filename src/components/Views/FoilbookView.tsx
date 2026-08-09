@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, MessageSquare, Heart, Share2, Send, ShieldCheck, User, Users, 
   Store, Tv, Search, Image as ImageIcon, Smile, MoreHorizontal, X, MessageCircle, 
@@ -6,6 +6,8 @@ import {
   Check, ArrowRight, DollarSign, RefreshCw, BadgeCheck, Save
 } from 'lucide-react';
 import { MOCK_SLABS } from '../../mockData/cards';
+import { getCurrentUser, subscribeAuth, updateUserProfile } from '../../services/authService';
+import { UserProfile } from '../../types';
 
 interface ChatMessage {
   id: string;
@@ -46,15 +48,32 @@ const POKEMON_BADGES = [
 
 export const FoilbookView: React.FC = () => {
   const [navTab, setNavTab] = useState<'feed' | 'marketplace' | 'messages' | 'settings'>('feed');
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(getCurrentUser());
 
-  // User profile state
+  // User profile state synced with authService
   const [userProfile, setUserProfile] = useState({
-    displayName: 'Alex Vance',
-    handle: '@alexvance_vca',
-    bio: 'Pokémon TCG collector & VCA Gem Mint enthusiast. Hunting Base Set Charizards & 151 SIRs.',
-    favoritePokemon: 'Charizard',
-    avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&auto=format&fit=crop&q=80',
+    displayName: currentUser?.displayName || 'Alex Vance',
+    handle: currentUser?.handle || '@alexvance_vca',
+    bio: currentUser?.bio || 'Pokémon TCG collector & VCA Gem Mint enthusiast. Hunting Base Set Charizards & 151 SIRs.',
+    favoritePokemon: currentUser?.favoritePokemon || 'Charizard',
+    avatar: currentUser?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   });
+
+  useEffect(() => {
+    const unsub = subscribeAuth((u) => {
+      setCurrentUser(u);
+      if (u) {
+        setUserProfile({
+          displayName: u.displayName || 'Alex Vance',
+          handle: u.handle || '@alexvance_vca',
+          bio: u.bio || 'Pokémon TCG collector & VCA Gem Mint enthusiast. Hunting Base Set Charizards & 151 SIRs.',
+          favoritePokemon: u.favoritePokemon || 'Charizard',
+          avatar: u.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+        });
+      }
+    });
+    return unsub;
+  }, []);
 
   const [settingsSaved, setSettingsSaved] = useState(false);
 
@@ -823,9 +842,20 @@ export const FoilbookView: React.FC = () => {
 
                 <div className="pt-4 flex justify-end">
                   <button
-                    onClick={() => {
-                      setSettingsSaved(true);
-                      setTimeout(() => setSettingsSaved(false), 2500);
+                    onClick={async () => {
+                      try {
+                        await updateUserProfile({
+                          displayName: userProfile.displayName,
+                          handle: userProfile.handle,
+                          bio: userProfile.bio,
+                          favoritePokemon: userProfile.favoritePokemon,
+                          avatarUrl: userProfile.avatar,
+                        });
+                        setSettingsSaved(true);
+                        setTimeout(() => setSettingsSaved(false), 2500);
+                      } catch (err) {
+                        console.error('Failed to save settings:', err);
+                      }
                     }}
                     className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-display font-bold text-xs uppercase flex items-center gap-2 cursor-pointer shadow-lg shadow-purple-500/20"
                   >

@@ -151,13 +151,15 @@ export const GradingSubmissionWizard: React.FC<GradingSubmissionWizardProps> = (
             </div>
           )}
 
-          {/* Step 2 & 3: Front / Back Flat Shot */}
+          {/* Step 2 & 3: Front / Back Flat Shot with HUD Scanline Sweep */}
           {(currentStep === 2 || currentStep === 3) && (
             <div className="relative aspect-video rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden">
               <img src={card.imageUrl} alt={card.name} className="h-full object-contain p-4 opacity-80" />
+              {/* Scanline Sweep Animation */}
+              <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/20 via-transparent to-transparent animate-scan-line pointer-events-none" />
               <div className="absolute inset-8 border-2 border-dashed border-cyan-400/80 rounded-2xl pointer-events-none flex items-center justify-center">
                 <span className="px-3 py-1 rounded-full bg-slate-950/80 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold">
-                  {currentStep === 2 ? 'FRONT FLAT OVERHEAD SHOT' : 'REVERSE SIDE OVERHEAD SHOT'}
+                  {currentStep === 2 ? 'FRONT FLAT OVERHEAD SHOT • SCANNING OPTICAL METRICS' : 'REVERSE SIDE OVERHEAD SHOT • SCANNING BACK SURFACE'}
                 </span>
               </div>
             </div>

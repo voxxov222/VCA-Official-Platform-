@@ -42,6 +42,32 @@ export const Slab3DCanvas: React.FC<Slab3DCanvasProps> = ({
     const slabGroup = new THREE.Group();
     scene.add(slabGroup);
 
+    // Background Particle Motes Field
+    const particleCount = 180;
+    const particleGeo = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(particleCount * 3);
+    const particleSpeeds = new Float32Array(particleCount);
+
+    for (let i = 0; i < particleCount; i++) {
+      particlePositions[i * 3] = (Math.random() - 0.5) * 16;
+      particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 14;
+      particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2;
+      particleSpeeds[i] = 0.003 + Math.random() * 0.008;
+    }
+
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+
+    const particleMat = new THREE.PointsMaterial({
+      color: 0x22d3ee,
+      size: 0.06,
+      transparent: true,
+      opacity: 0.45,
+      blending: THREE.AdditiveBlending
+    });
+
+    const particlesMesh = new THREE.Points(particleGeo, particleMat);
+    scene.add(particlesMesh);
+
     // Outer Acrylic Slab Geometry
     const slabWidth = 2.4;
     const slabHeight = 3.6;
@@ -51,14 +77,14 @@ export const Slab3DCanvas: React.FC<Slab3DCanvasProps> = ({
     const acrylicMat = new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.38,
       roughness: 0.05,
-      metalness: 0.1,
-      transmission: 0.9,
-      ior: 1.5,
+      metalness: 0.15,
+      transmission: 0.92,
+      ior: 1.52,
       reflectivity: 0.9,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
+      clearcoatRoughness: 0.08,
       side: THREE.DoubleSide
     });
     const acrylicMesh = new THREE.Mesh(acrylicGeo, acrylicMat);
@@ -66,7 +92,7 @@ export const Slab3DCanvas: React.FC<Slab3DCanvasProps> = ({
 
     // Bevel frame outline
     const borderEdges = new THREE.EdgesGeometry(acrylicGeo);
-    const borderMat = new THREE.LineBasicMaterial({ color: 0x22d3ee, transparent: true, opacity: 0.5 });
+    const borderMat = new THREE.LineBasicMaterial({ color: 0x22d3ee, transparent: true, opacity: 0.6 });
     const borderLine = new THREE.LineSegments(borderEdges, borderMat);
     slabGroup.add(borderLine);
 
@@ -87,17 +113,32 @@ export const Slab3DCanvas: React.FC<Slab3DCanvasProps> = ({
     canvasHeader.width = 512;
     canvasHeader.height = 128;
     const ctx = canvasHeader.getContext('2d');
-    if (ctx) {
-      // Holographic gradient
-      const grad = ctx.createLinearGradient(0, 0, 512, 128);
+
+    const redrawHeaderCanvas = (shiftOffset = 0) => {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, 512, 128);
+
+      // Dynamic Holographic Gradient with rotation shift
+      const grad = ctx.createLinearGradient(shiftOffset, 0, 512 + shiftOffset, 128);
       grad.addColorStop(0, '#22d3ee');
-      grad.addColorStop(0.3, '#c084fc');
-      grad.addColorStop(0.7, '#fbbf24');
-      grad.addColorStop(1, '#38bdf8');
+      grad.addColorStop(0.25, '#c084fc');
+      grad.addColorStop(0.5, '#fbbf24');
+      grad.addColorStop(0.75, '#38bdf8');
+      grad.addColorStop(1, '#22d3ee');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 512, 128);
 
-      // Black text
+      // Light sweep sheen band
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.beginPath();
+      ctx.moveTo(100 + (shiftOffset % 300), 0);
+      ctx.lineTo(180 + (shiftOffset % 300), 0);
+      ctx.lineTo(120 + (shiftOffset % 300), 128);
+      ctx.lineTo(40 + (shiftOffset % 300), 128);
+      ctx.closePath();
+      ctx.fill();
+
+      // Header Copy
       ctx.fillStyle = '#05070a';
       ctx.font = '900 48px Orbitron, sans-serif';
       ctx.fillText('VCA', 24, 75);
@@ -117,7 +158,9 @@ export const Slab3DCanvas: React.FC<Slab3DCanvasProps> = ({
 
       ctx.font = '600 16px "JetBrains Mono", monospace';
       ctx.fillText(serialNumber, 24, 115);
-    }
+    };
+
+    redrawHeaderCanvas(0);
 
     const headerTexture = new THREE.CanvasTexture(canvasHeader);
     const headerMat = new THREE.MeshBasicMaterial({ map: headerTexture, side: THREE.DoubleSide });
@@ -149,43 +192,78 @@ export const Slab3DCanvas: React.FC<Slab3DCanvasProps> = ({
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
     scene.add(ambientLight);
 
-    const cyanPointLight = new THREE.PointLight(0x22d3ee, 3, 10);
+    const cyanPointLight = new THREE.PointLight(0x22d3ee, 3.5, 12);
     cyanPointLight.position.set(3, 3, 4);
     scene.add(cyanPointLight);
 
-    const violetPointLight = new THREE.PointLight(0xc084fc, 2, 10);
+    const violetPointLight = new THREE.PointLight(0xc084fc, 2.5, 10);
     violetPointLight.position.set(-3, -2, 3);
     scene.add(violetPointLight);
 
-    // Interactivity: Drag to Rotate
+    // Interactivity: Drag to Rotate with Momentum & Touch Support
     let isDragging = false;
-    let previousMousePosition = { x: 0, y: 0 };
+    let previousPosition = { x: 0, y: 0 };
+    let velocity = { x: 0, y: 0 };
+    let idleTimer: ReturnType<typeof setTimeout> | null = null;
+    let isIdle = false;
 
-    const onMouseDown = (e: MouseEvent) => {
+    const resetIdleTimer = () => {
+      isIdle = false;
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        isIdle = true;
+      }, 4000); // Resume auto-rotate after 4s idle
+    };
+
+    const handlePointerDown = (clientX: number, clientY: number) => {
       isDragging = true;
-      previousMousePosition = { x: e.clientX, y: e.clientY };
+      previousPosition = { x: clientX, y: clientY };
+      velocity = { x: 0, y: 0 };
+      resetIdleTimer();
     };
 
-    const onMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (clientX: number, clientY: number) => {
       if (!isDragging || !interactive) return;
-      const deltaX = e.clientX - previousMousePosition.x;
-      const deltaY = e.clientY - previousMousePosition.y;
+      const deltaX = clientX - previousPosition.x;
+      const deltaY = clientY - previousPosition.y;
 
-      slabGroup.rotation.y += deltaX * 0.01;
-      slabGroup.rotation.x += deltaY * 0.01;
+      velocity = { x: deltaX * 0.008, y: deltaY * 0.008 };
 
-      previousMousePosition = { x: e.clientX, y: e.clientY };
+      slabGroup.rotation.y += velocity.x;
+      slabGroup.rotation.x += velocity.y;
+
+      previousPosition = { x: clientX, y: clientY };
+      resetIdleTimer();
     };
 
-    const onMouseUp = () => {
+    const handlePointerUp = () => {
       isDragging = false;
+      resetIdleTimer();
     };
+
+    const onMouseDown = (e: MouseEvent) => handlePointerDown(e.clientX, e.clientY);
+    const onMouseMove = (e: MouseEvent) => handlePointerMove(e.clientX, e.clientY);
+    const onMouseUp = () => handlePointerUp();
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) handlePointerDown(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 1) handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const onTouchEnd = () => handlePointerUp();
 
     if (interactive) {
       container.addEventListener('mousedown', onMouseDown);
       window.addEventListener('mousemove', onMouseMove);
       window.addEventListener('mouseup', onMouseUp);
+
+      container.addEventListener('touchstart', onTouchStart, { passive: true });
+      window.addEventListener('touchmove', onTouchMove, { passive: true });
+      window.addEventListener('touchend', onTouchEnd);
     }
+
+    resetIdleTimer();
 
     // Animation Loop
     let animationFrameId: number;
@@ -193,13 +271,38 @@ export const Slab3DCanvas: React.FC<Slab3DCanvasProps> = ({
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-
       const elapsedTime = clock.getElapsedTime();
 
-      // Gentle floating sine wave movement when not dragging
+      // Particle Drift Animation
+      const positions = particleGeo.attributes.position.array as Float32Array;
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3 + 1] += particleSpeeds[i];
+        if (positions[i * 3 + 1] > 7) positions[i * 3 + 1] = -7;
+      }
+      particleGeo.attributes.position.needsUpdate = true;
+
+      // Momentum Velocity Damping
       if (!isDragging) {
-        slabGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.12;
-        slabGroup.rotation.y += 0.005; // slow float spin
+        if (Math.abs(velocity.x) > 0.0001 || Math.abs(velocity.y) > 0.0001) {
+          slabGroup.rotation.y += velocity.x;
+          slabGroup.rotation.x += velocity.y;
+          velocity.x *= 0.94; // inertia damping
+          velocity.y *= 0.94;
+        }
+
+        // Idle floating sine wave and slow spin
+        if (isIdle) {
+          slabGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.12;
+          slabGroup.rotation.y += 0.006;
+          slabGroup.rotation.x *= 0.98;
+        }
+      }
+
+      // Shimmer sweep texture update based on slab rotation
+      if (headerTexture && ctx) {
+        const angleShift = Math.floor(slabGroup.rotation.y * 120);
+        redrawHeaderCanvas(angleShift);
+        headerTexture.needsUpdate = true;
       }
 
       renderer.render(scene, camera);
@@ -220,11 +323,15 @@ export const Slab3DCanvas: React.FC<Slab3DCanvasProps> = ({
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      if (idleTimer) clearTimeout(idleTimer);
       window.removeEventListener('resize', handleResize);
       if (interactive) {
         container.removeEventListener('mousedown', onMouseDown);
         window.removeEventListener('mousemove', onMouseMove);
         window.removeEventListener('mouseup', onMouseUp);
+        container.removeEventListener('touchstart', onTouchStart);
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('touchend', onTouchEnd);
       }
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);

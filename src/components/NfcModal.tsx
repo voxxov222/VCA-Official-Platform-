@@ -24,6 +24,7 @@ export const NfcModal: React.FC<NfcModalProps> = ({
   const [isScanningNfc, setIsScanningNfc] = useState(false);
   const [nfcResult, setNfcResult] = useState<'IDLE' | 'SUCCESS' | 'FAILED'>('SUCCESS');
   const [showSignaturePad, setShowSignaturePad] = useState(false);
+  const [showHapticFlash, setShowHapticFlash] = useState(false);
   const [webNfcSupported] = useState(() => 'NDEFReader' in window);
 
   const targetSlab = slab || {
@@ -52,11 +53,18 @@ export const NfcModal: React.FC<NfcModalProps> = ({
     setTimeout(() => {
       setIsScanningNfc(false);
       setNfcResult('SUCCESS');
-    }, 1800);
+      setShowHapticFlash(true);
+      setTimeout(() => setShowHapticFlash(false), 300);
+    }, 1500);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-md">
+      {/* Screen Haptic Flash on tap success */}
+      {showHapticFlash && (
+        <div className="fixed inset-0 z-50 bg-cyan-400/20 pointer-events-none transition-opacity duration-300" />
+      )}
+
       <div className="glass-panel w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 border border-cyan-500/30 space-y-6 shadow-2xl relative overflow-hidden max-h-[90vh] overflow-y-auto">
         
         {/* Glow ambient background */}
@@ -98,8 +106,8 @@ export const NfcModal: React.FC<NfcModalProps> = ({
           
           {/* Animated Ripples */}
           <div className="relative flex items-center justify-center w-24 h-24 my-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-20" />
-            <span className="animate-pulse absolute inline-flex h-20 w-20 rounded-full bg-purple-500 opacity-30" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-30" />
+            <span className="animate-pulse absolute inline-flex h-20 w-20 rounded-full bg-purple-500 opacity-40" />
             
             <button
               onClick={simulateNfcScan}
@@ -127,12 +135,16 @@ export const NfcModal: React.FC<NfcModalProps> = ({
         {nfcResult === 'SUCCESS' && (
           <div className="space-y-4">
             
-            {/* Status Banner */}
+            {/* Status Banner with Self-Drawing SVG Checkmark */}
             <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
+                <div className="p-1.5 rounded-full bg-emerald-500/20 text-emerald-400 shrink-0">
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" className="svg-draw-stroke" />
+                  </svg>
+                </div>
                 <div>
-                  <div className="text-xs font-bold text-emerald-300">✅ AUTHENTICATED • SEAL INTACT</div>
+                  <div className="text-xs font-bold text-emerald-300">AUTHENTICATED • SEAL INTACT</div>
                   <div className="text-[10px] font-mono text-emerald-400/80">
                     NTAG424 CMAC Match: {targetSlab.nfcUid}
                   </div>

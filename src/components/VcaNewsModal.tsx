@@ -66,7 +66,7 @@ const NEWS_ARTICLES: NewsArticle[] = [
   {
     id: 'news-003',
     category: 'VCA NEWS',
-    title: 'VScan AI 2.0 Surface Defect Neural Model Live Across All Scanning Terminals',
+    title: 'VScan AI 2.4 Surface Defect Neural Model Live Across All Scanning Terminals',
     summary: 'VCA Engineering has deployed Sub-Pixel Surface Vision models offering 99.4% subgrade accuracy for centering, corner whitening, and foil scratch identification.',
     timestamp: '1 hour ago',
     impactScore: 92,
@@ -108,6 +108,52 @@ const NEWS_ARTICLES: NewsArticle[] = [
     impactScore: 94,
     author: 'VCA Cybersecurity Lab',
     badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/40'
+  },
+  {
+    id: 'news-007',
+    category: 'VCA NEWS',
+    title: 'Wholesale Supplier Vault Launches Direct Master Set Ordering Channel',
+    summary: 'Collectors can now purchase 100% complete Pokémon master sets (including 151, Base Set 1st Ed, and Evolving Skies) with VCA Direct insured shipping.',
+    timestamp: '6 hours ago',
+    impactScore: 91,
+    author: 'VCA Vault Operations',
+    badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+  },
+  {
+    id: 'news-008',
+    category: 'LIVE PRICE',
+    title: 'Crown Zenith Giratina VSTAR Galarian Gallery GG69 Up +16.3% Following Tournament Meta Demand',
+    summary: 'Competitive TCG players and high-grade collectors drive demand for Gold Secret Rares from Crown Zenith, with VCA 10 Gem Mints trading over $320 CAD.',
+    timestamp: '8 hours ago',
+    impactScore: 86,
+    author: 'VCA Index Feed',
+    cardName: 'Giratina VSTAR GG69',
+    priceChange: '+16.3%',
+    currentPriceCAD: '$320 CAD',
+    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+  },
+  {
+    id: 'news-009',
+    category: 'AUCTION RECORD',
+    title: 'Gold Star Rayquaza EX Deoxys #107 VCA 9.5 Sells for $12,400 CAD in Private Escrow Trade',
+    summary: 'One of the rarest Gold Stars in existence changes hands via VCA Zero-Fraud Escrow, transferring NTAG424 NFC ownership live on the VCA Ledger.',
+    timestamp: '10 hours ago',
+    impactScore: 97,
+    author: 'VCA Escrow Services',
+    cardName: 'Rayquaza Gold Star #107',
+    priceChange: '+28.0%',
+    currentPriceCAD: '$12,400 CAD',
+    badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+  },
+  {
+    id: 'news-010',
+    category: 'POKÉMON TCG',
+    title: 'Nintendo & Pokémon Company Tease "SV9 Heat Wave Arena" Expansion Coming Q3 2025',
+    summary: 'Official Japanese press releases confirm the return of Owner Pokémon & secret illustration rare trainer cards, sparking intense early market speculation.',
+    timestamp: '12 hours ago',
+    impactScore: 89,
+    author: 'Tokyo TCG Wire',
+    badgeColor: 'bg-red-500/20 text-red-300 border-red-500/40'
   }
 ];
 
