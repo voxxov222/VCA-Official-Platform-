@@ -51,7 +51,8 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'market-intelligence', label: 'SIGNALS' },
     { id: 'watchlist', label: 'WATCHLIST' },
     { id: 'database', label: 'DATABASE' },
-    { id: 'community', label: 'COMMUNITY' },
+    { id: 'foilbook', label: 'FOILBOOK' },
+    { id: 'profile', label: 'PROFILE' },
     { id: 'ledger', label: 'LEDGER' },
     { id: 'admin', label: 'ADMIN QC' }
   ];
@@ -126,9 +127,15 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Auth Profile / Sign In Button */}
             <button
-              onClick={onOpenAuthModal}
+              onClick={() => {
+                if (user) {
+                  onNavigate('profile');
+                } else {
+                  onOpenAuthModal();
+                }
+              }}
               className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-500/40 text-slate-200 transition-all flex items-center gap-2 font-mono text-xs font-bold cursor-pointer"
-              title={user ? `Logged in as ${user.displayName}` : 'Sign In / Register'}
+              title={user ? `Logged in as ${user.displayName} - Click to view profile` : 'Sign In / Register'}
             >
               {user ? (
                 <>

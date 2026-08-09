@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { Radio, X, Zap, ArrowUpRight, ArrowDownRight, Award, Flame } from 'lucide-react';
+import { Radio, X, Zap, ArrowUpRight, ArrowDownRight, Award, Flame, Tv } from 'lucide-react';
 import { BREAKING_NEWS_ITEMS } from '../mockData/cards';
 
-export const BreakingWire: React.FC = () => {
+interface BreakingWireProps {
+  onOpenNewsModal?: () => void;
+}
+
+export const BreakingWire: React.FC<BreakingWireProps> = ({ onOpenNewsModal }) => {
   const [dismissed, setDismissed] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -13,14 +17,20 @@ export const BreakingWire: React.FC = () => {
       <div className="max-w-7xl mx-auto px-3 py-1.5 flex items-center justify-between gap-4">
         
         {/* Label Tag */}
-        <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold shrink-0">
-          <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-          <span className="tracking-widest uppercase text-[10px] font-display">VCA WIRE</span>
-        </div>
+        <button
+          onClick={onOpenNewsModal}
+          className="flex items-center gap-2 px-2.5 py-0.5 rounded bg-red-600/20 hover:bg-red-600/30 border border-red-500/40 text-red-300 font-bold shrink-0 transition-all cursor-pointer group"
+          title="Open CNN Pokémon News Broadcast"
+        >
+          <Radio className="w-3.5 h-3.5 text-red-400 animate-pulse" />
+          <span className="tracking-widest uppercase text-[10px] font-display">CNN • VCA WIRE</span>
+          <Tv className="w-3 h-3 text-red-400 group-hover:scale-110 transition-transform" />
+        </button>
 
         {/* Marquee Container */}
         <div 
-          className="flex-1 overflow-hidden relative"
+          className="flex-1 overflow-hidden relative cursor-pointer"
+          onClick={onOpenNewsModal}
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
@@ -40,7 +50,7 @@ export const BreakingWire: React.FC = () => {
               };
 
               return (
-                <div key={`${item.id}-${index}`} className="inline-flex items-center gap-2 text-slate-300 hover:text-cyan-200 transition-colors cursor-pointer">
+                <div key={`${item.id}-${index}`} className="inline-flex items-center gap-2 text-slate-300 hover:text-cyan-200 transition-colors">
                   {getIcon()}
                   <span className="text-[11px] font-medium tracking-tight">{item.text}</span>
                   <span className="text-slate-600 font-sans">•</span>
@@ -52,7 +62,12 @@ export const BreakingWire: React.FC = () => {
 
         {/* Controls */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[10px] text-slate-500 hidden sm:inline">LIVE FEED</span>
+          <button
+            onClick={onOpenNewsModal}
+            className="text-[10px] text-cyan-400 hover:text-cyan-300 underline font-bold hidden sm:inline cursor-pointer"
+          >
+            LIVE NEWS FEED
+          </button>
           <button
             onClick={() => setDismissed(true)}
             className="p-1 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors"
@@ -65,3 +80,4 @@ export const BreakingWire: React.FC = () => {
     </div>
   );
 };
+

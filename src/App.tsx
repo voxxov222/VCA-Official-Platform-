@@ -7,6 +7,7 @@ import { GradingSubmissionWizard } from './components/GradingSubmissionWizard';
 import { CardComparisonModal } from './components/CardComparisonModal';
 import { AuthModal } from './components/AuthModal';
 import { WatchlistView } from './components/WatchlistView';
+import { VcaNewsModal } from './components/VcaNewsModal';
 
 // Views
 import { HomeView } from './components/Views/HomeView';
@@ -15,7 +16,8 @@ import { VaultView } from './components/Views/VaultView';
 import { MarketplaceView } from './components/Views/MarketplaceView';
 import { MarketIntelligenceView } from './components/Views/MarketIntelligenceView';
 import { CardDatabaseView } from './components/Views/CardDatabaseView';
-import { CommunityView } from './components/Views/CommunityView';
+import { FoilbookView } from './components/Views/FoilbookView';
+import { ProfileView } from './components/Views/ProfileView';
 import { LedgerView } from './components/Views/LedgerView';
 import { AdminView } from './components/Views/AdminView';
 
@@ -31,6 +33,7 @@ export function App() {
   const [selectedNfcSlab, setSelectedNfcSlab] = useState<VCASlab | undefined>(undefined);
   const [showNfcModal, setShowNfcModal] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [showNewsModal, setShowNewsModal] = useState<boolean>(false);
   const [wizardCard, setWizardCard] = useState<CardItem | null>(null);
   const [compareCard, setCompareCard] = useState<CardItem | null>(null);
 
@@ -50,7 +53,7 @@ export function App() {
     <div className="min-h-screen bg-[#05070A] text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-slate-950 flex flex-col">
       
       {/* Top Breaking Wire Ticker */}
-      <BreakingWire />
+      <BreakingWire onOpenNewsModal={() => setShowNewsModal(true)} />
 
       {/* Main Sticky Navigation Header */}
       <Header
@@ -115,8 +118,16 @@ export function App() {
           />
         )}
 
-        {currentView === 'community' && (
-          <CommunityView />
+        {currentView === 'foilbook' && (
+          <FoilbookView />
+        )}
+
+        {currentView === 'profile' && (
+          <ProfileView
+            onNavigate={(v) => setCurrentView(v)}
+            onOpenNfcModal={(slab) => { setSelectedNfcSlab(slab); setShowNfcModal(true); }}
+            onToast={(m) => showToast(m)}
+          />
         )}
 
         {currentView === 'ledger' && (
@@ -136,6 +147,11 @@ export function App() {
       </main>
 
       {/* MODALS */}
+
+      {/* CNN News Wire Modal */}
+      {showNewsModal && (
+        <VcaNewsModal onClose={() => setShowNewsModal(false)} />
+      )}
 
       {/* Auth Modal */}
       {showAuthModal && (
