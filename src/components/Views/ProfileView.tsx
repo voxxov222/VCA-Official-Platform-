@@ -398,7 +398,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           }`}
         >
           <MessageSquare className="w-4 h-4 text-indigo-400" />
-          <span>FOILBOOK POSTS (8)</span>
+          <span>SLABBOOK POSTS (8)</span>
         </button>
 
         <button

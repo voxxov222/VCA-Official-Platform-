@@ -9,6 +9,8 @@ import { MOCK_SLABS } from '../../mockData/cards';
 import { getCurrentUser, subscribeAuth, updateUserProfile } from '../../services/authService';
 import { UserProfile } from '../../types';
 
+import { appendLedgerEvent } from '../../services/nfcLedgerService';
+
 interface ChatMessage {
   id: string;
   sender: string;
@@ -292,6 +294,20 @@ export const SlabbookView: React.FC = () => {
     };
 
     setMarketplaceListings([listing, ...marketplaceListings]);
+
+    // Append event to VCA Ledger
+    appendLedgerEvent(
+      'CARD_LISTED',
+      'VCA-000-000-001',
+      `${newListingCard.cardName} (${newListingCard.grade})`,
+      `${userProfile.displayName} (Slabbook Seller)`,
+      {
+        listingPriceUsd: Number(newListingCard.priceUsd) || 0,
+        listingType: newListingCard.type,
+        platform: 'Slabbook Social Marketplace'
+      }
+    );
+
     setShowCreateListingModal(false);
   };
 
@@ -310,7 +326,7 @@ export const SlabbookView: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="font-display font-black text-2xl text-slate-100 tracking-wider">
-                FOILBOOK
+                SLABBOOK
               </h1>
               <span className="px-2 py-0.5 rounded-md bg-purple-500/20 border border-purple-500/40 text-purple-300 font-mono text-[10px] font-bold">
                 POKÉMON SOCIAL NETWORK
@@ -562,7 +578,7 @@ export const SlabbookView: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 2: FOILBOOK MARKETPLACE */}
+          {/* TAB 2: SLABBOOK MARKETPLACE */}
           {navTab === 'marketplace' && (
             <div className="space-y-6">
               {/* Header Banner & Create Button */}

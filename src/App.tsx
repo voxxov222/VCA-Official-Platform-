@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { BreakingWire } from './components/BreakingWire';
 import { Header } from './components/Header';
+import { SplashPage } from './components/SplashPage';
+import { BluePhoenixLogo } from './components/BluePhoenixLogo';
 import { VScanScannerModal } from './components/VScanScannerModal';
 import { NfcModal } from './components/NfcModal';
 import { GradingSubmissionWizard } from './components/GradingSubmissionWizard';
@@ -21,12 +23,14 @@ import { ProfileView } from './components/Views/ProfileView';
 import { LedgerView } from './components/Views/LedgerView';
 import { AdminView } from './components/Views/AdminView';
 import { Card3DShowcaseView } from './components/Views/Card3DShowcaseView';
+import { PackRipper3DView } from './components/Views/PackRipper3DView';
 
 import { CardItem, VCASlab } from './types';
 import { SAMPLE_CARDS } from './mockData/cards';
-import { ShieldCheck, Twitter, Github, Disc as Discord } from 'lucide-react';
+import { ShieldCheck, Twitter, Github, Disc as Discord, Flame } from 'lucide-react';
 
 export function App() {
+  const [showSplash, setShowSplash] = useState<boolean>(true);
   const [currentView, setCurrentView] = useState<string>('home');
   
   // Modals
@@ -50,8 +54,21 @@ export function App() {
     showToast(`Added ${card.name} (Grade #${gradeEstimate}) to your Vault Portfolio!`);
   };
 
+  // If opening splash page is active, show the immersive Blue Phoenix Splash Screen!
+  if (showSplash) {
+    return (
+      <SplashPage
+        onEnter={() => setShowSplash(false)}
+        onNavigateToView={(view) => {
+          setCurrentView(view);
+          setShowSplash(false);
+        }}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#05070A] text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-slate-950 flex flex-col">
+    <div className="min-h-screen bg-[#03060C] text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-slate-950 flex flex-col">
       
       {/* Top Breaking Wire Ticker */}
       <BreakingWire onOpenNewsModal={() => setShowNewsModal(true)} />
@@ -63,6 +80,7 @@ export function App() {
         onOpenScanner={() => setShowScanner(true)}
         onOpenNfcModal={() => { setSelectedNfcSlab(undefined); setShowNfcModal(true); }}
         onOpenAuthModal={() => setShowAuthModal(true)}
+        onShowSplash={() => setShowSplash(true)}
       />
 
       {/* Toast Alert Popup */}
@@ -76,6 +94,13 @@ export function App() {
       {/* Main Body View Switching */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 pt-4">
         <div key={currentView} className="glitch-wipe-enter bg-hud-grid py-2 min-h-[80vh] rounded-2xl">
+          {currentView === 'pack-ripper' && (
+            <PackRipper3DView
+              onToast={(m) => showToast(m)}
+              onNavigate={(v) => setCurrentView(v)}
+            />
+          )}
+
           {currentView === 'card3d' && (
             <Card3DShowcaseView
               onOpenNfcModal={(slab) => { setSelectedNfcSlab(slab as any); setShowNfcModal(true); }}
@@ -225,18 +250,27 @@ export function App() {
       )}
 
       {/* FOOTER */}
-      <footer className="w-full bg-slate-950 border-t border-slate-800/80 py-12 mt-auto text-xs font-mono">
+      <footer className="w-full bg-[#020408] border-t border-cyan-500/20 py-12 mt-auto text-xs font-mono">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
           
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-cyan-400" />
-              <span className="font-display font-black text-sm text-slate-100">VCA AUTHORITY</span>
+            <div className="flex items-center gap-3">
+              <BluePhoenixLogo size="sm" />
+              <span className="font-display font-black text-sm text-slate-100 tracking-wider">VCA PHOENIX AUTHORITY</span>
             </div>
             <p className="text-slate-400 text-[11px] leading-relaxed">
-              Verified Card Authority — NFC-encrypted trading card grading, AI condition scoring, and immutable collectible authentication ledger.
+              Verified Card Authority — Powered by the Blue Phoenix engine. NFC-encrypted trading card grading, Gemini vision subgrade analysis, and tamper-proof ledger.
             </p>
-            <div className="text-[10px] text-cyan-400 font-bold">
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                onClick={() => setShowSplash(true)}
+                className="px-2.5 py-1 rounded bg-slate-900 border border-cyan-500/30 text-cyan-400 hover:text-cyan-300 font-bold text-[10px] flex items-center gap-1 cursor-pointer"
+              >
+                <Flame className="w-3 h-3 text-cyan-400" />
+                <span>REPLAY SPLASH INTRO</span>
+              </button>
+            </div>
+            <div className="text-[10px] text-cyan-400/80 font-bold">
               © 2026 VCA INC. ALL RIGHTS RESERVED.
             </div>
           </div>
@@ -245,9 +279,10 @@ export function App() {
             <div className="text-slate-200 font-bold uppercase tracking-wider">PLATFORM SUITE</div>
             <div className="flex flex-col space-y-1 text-slate-400">
               <button onClick={() => setShowScanner(true)} className="hover:text-cyan-300 text-left cursor-pointer">VScan AI Camera</button>
+              <button onClick={() => setCurrentView('pack-ripper')} className="hover:text-cyan-300 text-left cursor-pointer">3D Pack Opening Arcade</button>
               <button onClick={() => setCurrentView('dashboard')} className="hover:text-cyan-300 text-left cursor-pointer">Investment Dashboard</button>
               <button onClick={() => setCurrentView('vault')} className="hover:text-cyan-300 text-left cursor-pointer">Authenticated Vault</button>
-              <button onClick={() => setCurrentView('marketplace')} className="hover:text-cyan-300 text-left cursor-pointer">Verified Marketplace</button>
+              <button onClick={() => setCurrentView('slabbook')} className="hover:text-cyan-300 text-left cursor-pointer">Slabbook Social Network</button>
             </div>
           </div>
 
@@ -255,7 +290,7 @@ export function App() {
             <div className="text-slate-200 font-bold uppercase tracking-wider">SECURITY & SPEC</div>
             <div className="flex flex-col space-y-1 text-slate-400">
               <span>NTAG424 DNA CMAC Encryption</span>
-              <span>SHA-256 Hash-Chained Ledger</span>
+              <span>Blue Phoenix Verification Core</span>
               <span>Gemini 3.6 Vision AI Engine</span>
               <span>VGAS 10-Point Condition Standard</span>
             </div>

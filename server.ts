@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI, Type } from '@google/genai';
 import { SAMPLE_CARDS, INITIAL_SLABS, INITIAL_LEDGER_EVENTS } from './src/mockData/cards.js';
+import { getMultiSourcePriceEstimate, MultiSourcePriceQuery } from './src/services/priceScraperService.js';
 
 dotenv.config();
 
@@ -356,6 +357,84 @@ app.post('/api/slabs/mint', (req: Request, res: Response) => {
   activeLedgerEvents.unshift(event);
 
   res.json({ success: true, slab: newSlab, event });
+});
+
+// API: Multi-Source Price Scraper Endpoint (integrated with pokemon-cards-value-scraper engine)
+app.get('/api/cards/prices', (req: Request, res: Response) => {
+  const name = (req.query.name as string) || 'Charizard';
+  const set = (req.query.set as string) || 'Base Set';
+  const cardNumber = (req.query.cardNumber as string) || '4/102';
+  const holo = (req.query.holo as string) || 'Holo';
+  const edition = (req.query.edition as string) || 'Unlimited';
+  const basePriceNum = req.query.basePrice ? parseFloat(req.query.basePrice as string) : 380;
+
+  const query: MultiSourcePriceQuery = { name, set, cardNumber, holo, edition };
+  const priceData = getMultiSourcePriceEstimate(query, basePriceNum);
+
+  res.json({
+    success: true,
+    engine: 'VCA-MultiSource-PriceScraper-v2',
+    scrapedSourcesCount: priceData.sources.length,
+    data: priceData
+  });
+});
+
+app.post('/api/cards/prices', (req: Request, res: Response) => {
+  const { name = 'Charizard', set = 'Base Set', cardNumber = '4/102', holo = 'Holo', edition = 'Unlimited', basePrice = 380 } = req.body;
+  const query: MultiSourcePriceQuery = { name, set, cardNumber, holo, edition };
+  const priceData = getMultiSourcePriceEstimate(query, basePrice);
+
+  res.json({
+    success: true,
+    engine: 'VCA-MultiSource-PriceScraper-v2',
+    scrapedSourcesCount: priceData.sources.length,
+    data: priceData
+  });
+});
+
+// API: Batch Collection Price Scraper
+app.post('/api/cards/estimate-collection', (req: Request, res: Response) => {
+  const { cards = [] } = req.body;
+  const list = cards.length > 0 ? cards : [
+    { name: 'Charizard', set: 'Base Set', cardNumber: '4/102', holo: 'Holo', edition: 'Unlimited' },
+    { name: 'Blastoise', set: 'Base Set', cardNumber: '2/102', holo: 'Holo', edition: 'Unlimited' },
+    { name: 'Venusaur', set: 'Base Set', cardNumber: '15/102', holo: 'Holo', edition: 'Unlimited' }
+  ];
+
+  const estimations = list.map((c: any) => getMultiSourcePriceEstimate(c, c.basePrice || 250));
+  
+  const totalTCGPlayer = estimations.reduce((sum, e) => {
+    const tcg = e.sources.find(s => s.sourceName === 'TCGplayer');
+    return sum + (tcg ? tcg.rawPriceUSD : e.totals.rawConsensusUSD);
+  }, 0);
+
+  const totalEbay = estimations.reduce((sum, e) => {
+    const eb = e.sources.find(s => s.sourceName === 'eBay Sold');
+    return sum + (eb ? eb.rawPriceUSD : e.totals.rawConsensusUSD);
+  }, 0);
+
+  const totalCardmarket = estimations.reduce((sum, e) => {
+    const cm = e.sources.find(s => s.sourceName === 'Cardmarket');
+    return sum + (cm ? cm.rawPriceUSD : e.totals.rawConsensusUSD);
+  }, 0);
+
+  const totalRawConsensus = estimations.reduce((sum, e) => sum + e.totals.rawConsensusUSD, 0);
+  const totalPSA9Consensus = estimations.reduce((sum, e) => sum + e.totals.psa9ConsensusUSD, 0);
+  const totalPSA10Consensus = estimations.reduce((sum, e) => sum + e.totals.psa10ConsensusUSD, 0);
+
+  res.json({
+    success: true,
+    totalCards: estimations.length,
+    collectionTotals: {
+      tcgplayerTotalUSD: totalTCGPlayer,
+      ebayTotalUSD: totalEbay,
+      cardmarketTotalUSD: totalCardmarket,
+      rawConsensusTotalUSD: totalRawConsensus,
+      psa9ConsensusTotalUSD: totalPSA9Consensus,
+      psa10ConsensusTotalUSD: totalPSA10Consensus,
+    },
+    items: estimations
+  });
 });
 
 // Setup Vite middleware for development or static serving in production

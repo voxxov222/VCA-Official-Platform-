@@ -1,10 +1,11 @@
 import React from 'react';
 import { 
   ShieldCheck, Cpu, TrendingUp, Lock, Camera, Sparkles, ArrowRight, 
-  CheckCircle2, Layers, Award, Radio, Globe, Zap, ExternalLink
+  CheckCircle2, Layers, Award, Radio, Globe, Zap, ExternalLink, Flame
 } from 'lucide-react';
 import { Slab3DCanvas } from '../Slab3DCanvas';
 import { HolographicLabel } from '../HolographicLabel';
+import { BluePhoenixLogo } from '../BluePhoenixLogo';
 
 interface HomeViewProps {
   onNavigate: (view: string) => void;
@@ -32,14 +33,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Left Text Column */}
           <div className="lg:col-span-7 space-y-6 text-left">
             
-            {/* Holographic Badge Tag */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+            {/* Holographic Badge Tag with Blue Phoenix Icon */}
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-cyan-400/40 text-cyan-300 font-mono text-xs font-bold uppercase tracking-widest shadow-[0_0_20px_rgba(34,211,238,0.25)]">
+              <BluePhoenixLogo size="sm" showGlow={false} />
+              <span>THE BLUE PHOENIX OF COLLECTIBLE AUTHENTICATION</span>
               <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-              <span>THE WORLD'S FIRST NFC-ENCRYPTED GRADING LEDGER</span>
             </div>
 
             <h1 className="font-display font-black text-4xl sm:text-6xl text-slate-100 tracking-tight leading-[1.1]">
-              The Future of Collectible Trust is <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-amber-300 bg-clip-text text-transparent">Verified.</span>
+              The Future of Collectible Trust is <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">Verified.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-slate-300 font-sans leading-relaxed max-w-2xl">
@@ -63,6 +65,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
               >
                 <Cpu className="w-4 h-4 text-purple-400" />
                 <span>SIMULATE NFC SLAB TAP</span>
+              </button>
+
+              <button
+                onClick={() => onNavigate('pack-ripper')}
+                className="px-6 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-display font-black text-xs tracking-wider flex items-center gap-2 shadow-[0_0_20px_rgba(251,191,36,0.4)] hover:shadow-[0_0_30px_rgba(251,191,36,0.6)] transition-all cursor-pointer active:scale-95"
+              >
+                <Sparkles className="w-4 h-4 fill-slate-950" />
+                <span>3D PACK RIPPER ARCADE</span>
               </button>
 
               <button

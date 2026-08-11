@@ -15,10 +15,12 @@ import {
   X,
   Menu,
   User,
-  Bell
+  Bell,
+  Flame
 } from 'lucide-react';
 import { getCurrentUser, subscribeAuth } from '../services/authService';
 import { UserProfile } from '../types/vca';
+import { BluePhoenixLogo } from './BluePhoenixLogo';
 
 interface HeaderProps {
   currentView: string;
@@ -26,6 +28,7 @@ interface HeaderProps {
   onOpenScanner: () => void;
   onOpenNfcModal: () => void;
   onOpenAuthModal: () => void;
+  onShowSplash?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -33,7 +36,8 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   onOpenScanner,
   onOpenNfcModal,
-  onOpenAuthModal
+  onOpenAuthModal,
+  onShowSplash
 }) => {
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(getCurrentUser());
@@ -45,6 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems = [
     { id: 'home', label: 'HOME' },
+    { id: 'pack-ripper', label: '3D PACK RIPPER' },
     { id: 'card3d', label: '3D CARDS' },
     { id: 'dashboard', label: 'DASHBOARD' },
     { id: 'vault', label: 'VAULT' },
@@ -59,21 +64,19 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-[#05070a]/90 backdrop-blur-xl border-b border-cyan-500/20">
+    <header className="sticky top-0 z-40 bg-[#03060c]/90 backdrop-blur-xl border-b border-cyan-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           
-          {/* Logo */}
+          {/* Blue Phoenix Logo */}
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => onNavigate('home')}
               className="flex items-center gap-3 text-left group focus:outline-none cursor-pointer"
             >
-              <div className="relative flex items-center justify-center w-10 h-10 rounded-lg bg-slate-900 border border-cyan-400/40 p-0.5 shadow-[0_0_15px_rgba(34,211,238,0.25)] group-hover:scale-105 transition-transform">
-                <ShieldCheck className="w-6 h-6 text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
-              </div>
+              <BluePhoenixLogo size="md" />
               <div>
-                <div className="flex items-center gap-1.5 font-display text-lg font-black tracking-wider text-white">
+                <div className="flex items-center gap-1.5 font-display text-lg font-black tracking-wider text-white group-hover:text-cyan-300 transition-colors">
                   VCA
                   <span className="text-[10px] bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 px-1.5 py-0.2 rounded font-mono font-bold tracking-widest">
                     VERIFIED
@@ -101,6 +104,17 @@ export const Header: React.FC<HeaderProps> = ({
                 {item.label}
               </button>
             ))}
+
+            {onShowSplash && (
+              <button
+                onClick={onShowSplash}
+                className="px-2.5 py-1.5 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-amber-950/40 transition-all cursor-pointer flex items-center gap-1"
+                title="Replay Splash Opening Intro"
+              >
+                <Flame className="w-3 h-3 text-cyan-400" />
+                <span>SPLASH</span>
+              </button>
+            )}
           </nav>
 
           {/* Action CTAs */}
