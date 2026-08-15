@@ -32,6 +32,52 @@ Development is being performed on the `foundation/production-stack` branch befor
 
 ---
 
+## 🎨 Approved VCA Brand Assets
+
+The latest VCA brand references supplied for production have been incorporated into the application design system.
+
+### Slab label
+
+`public/branding/vca-slab-label.svg`
+
+This is the canonical premium slab-label direction: VCA chrome mark, grade block, serial field, NFC authentication area, circuit-board/HUD detailing and cyan illumination.
+
+### Splash screen
+
+`public/branding/vca-splash-screen.svg`
+
+The VCA splash screen now uses the approved **Verified Card Authority / The Future of Collectible Trust is Verified** visual direction, with a restrained production status overlay and real VScan launch action.
+
+### Slab showcase
+
+`public/branding/vca-slab-showcase.svg`
+
+The dashboard/home experience also includes the approved premium slab presentation direction with verification, grade, certificate and QR treatment.
+
+### Branding rules
+
+- Near-black graphite base
+- Electric cyan primary accent
+- Violet secondary accent
+- Chrome/silver VCA hardware treatment
+- Gold/amber reserved for premium grading moments
+- Orbitron display typography
+- JetBrains Mono for serials and technical data
+- HUD/circuit detailing rather than generic AI gradients
+- No unsupported claims such as guaranteed authenticity, tamper-proof hardware or live data without the corresponding verified integration
+
+---
+
+## 🌐 Production Web Target
+
+The current Vercel deployment target is:
+
+urlVCA Official Platformhttps://vca-official-platform.vercel.app/
+
+The repository branding changes are prepared on `foundation/production-stack`. Vercel must be connected to that branch, or the branch must be merged to the configured production branch, before the public deployment can reflect these changes.
+
+---
+
 ## 📸 VScan — Real Camera Card Scanner
 
 VScan is designed to use the user's actual phone/tablet camera to photograph a physical card.
@@ -212,47 +258,6 @@ Docker, PostgreSQL, migrations, environment variables, persistent storage, healt
 
 ---
 
-## 🎨 VCA Design System
-
-The application follows the established VCA HUD aesthetic:
-
-- Near-black graphite backgrounds
-- Electric cyan primary accent
-- Violet secondary accent
-- Gold/amber reserved for premium grade/mint moments
-- Orbitron display typography
-- JetBrains Mono for serials/data
-- Glass panels
-- Scanline/HUD effects
-- Holographic foil effects
-- Premium slab presentation
-- Reduced-motion fallbacks
-
-The canonical slab includes VCA branding, NFC badge, card window, grade, card identity, metadata, serial/certificate information and QR presentation.
-
----
-
-## 🧰 Technology Stack
-
-| Layer | Production direction |
-|---|---|
-| Frontend | Next.js / React / TypeScript |
-| API | Node.js / TypeScript |
-| Database | PostgreSQL |
-| ORM | Prisma |
-| Storage | S3-compatible object storage |
-| Infrastructure | Docker / Linux VPS |
-| Reverse proxy | Nginx or Caddy |
-| Camera | Browser MediaDevices / camera APIs |
-| Vision | Configurable external vision provider |
-| Market data | Configurable reputable market-data providers |
-| NFC | Browser/native NFC adapters depending on hardware |
-| Authentication | Secure server-side sessions + RBAC |
-
-The repository may still contain legacy prototype components during migration. Those are not automatically considered production-ready merely because they remain in the codebase.
-
----
-
 ## 🚀 Local Development
 
 ### Prerequisites
@@ -299,6 +304,18 @@ npx prisma migrate dev --schema packages/database/prisma/schema.prisma
 ---
 
 ## 📋 Recent Production Changes
+
+### Branding update — August 2026
+
+- Added approved VCA slab-label branding asset
+- Added approved VCA splash-screen branding asset
+- Added approved VCA slab-showcase branding asset
+- Updated the splash screen to use the approved VCA branding artwork
+- Added the canonical slab label to the home experience
+- Added slab showcase presentation to the home experience
+- Removed prototype-style unsupported metrics/claims from the home experience
+- Changed NFC CTA language from simulation wording to verification wording
+- Updated public product copy to distinguish implemented functionality from configured integrations
 
 ### QR + NFC trust layer
 
