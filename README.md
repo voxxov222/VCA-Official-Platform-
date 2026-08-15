@@ -42,11 +42,31 @@ The latest VCA brand references supplied for production have been incorporated i
 
 This is the canonical premium slab-label direction: VCA chrome mark, grade block, serial field, NFC authentication area, circuit-board/HUD detailing and cyan illumination.
 
-### Splash screen
+### Interactive trust splash
 
 `public/branding/vca-splash-screen.svg`
 
-The VCA splash screen now uses the approved **Verified Card Authority / The Future of Collectible Trust is Verified** visual direction, with a restrained production status overlay and real VScan launch action.
+The splash presentation is now based on the supplied **VCA: The Future of Collectible Trust** technology-board visual. It presents the VCA slab architecture, VScan AI, NFC smart-slab layer, tamper-evidence layer and verification ledger in a single interactive hero presentation.
+
+### Splash interaction
+
+`src/components/SplashPage.tsx`
+
+The splash is no longer a static image-only screen. It now supports:
+
+- Pointer parallax on desktop
+- Touch/pointer drag interaction
+- Animated HUD scanlines
+- Holographic shimmer sweep
+- Pulsing interactive technology hotspots
+- VScan hotspot → launches the real VScan camera flow
+- NFC/tamper/ledger hotspots → contextual technology panels
+- Accessible dialog controls
+- Reduced-motion fallback
+- Optional browser-safe splash audio
+- Direct **ENTER VCA** action
+
+The presentation is visual/marketing UI. It does **not** turn a depicted feature into a claimed production capability. The hotspot descriptions explicitly preserve VCA's trust rule around configured hardware and external providers.
 
 ### Slab showcase
 
@@ -74,7 +94,7 @@ The current Vercel deployment target is:
 
 urlVCA Official Platformhttps://vca-official-platform.vercel.app/
 
-The repository branding changes are prepared on `foundation/production-stack`. Vercel must be connected to that branch, or the branch must be merged to the configured production branch, before the public deployment can reflect these changes.
+The latest splash/branding implementation is committed to `main`. Vercel must be connected to the configured production branch for the public deployment to reflect the commit.
 
 ---
 
@@ -305,17 +325,28 @@ npx prisma migrate dev --schema packages/database/prisma/schema.prisma
 
 ## 📋 Recent Production Changes
 
-### Branding update — August 2026
+### Interactive trust splash — August 2026
+
+- Replaced the previous splash artwork with the supplied VCA **The Future of Collectible Trust** technology presentation direction
+- Reworked `SplashPage` as an interactive presentation instead of a static screen
+- Added desktop pointer parallax
+- Added touch/pointer drag interaction
+- Added animated HUD scanline and holographic shimmer effects
+- Added clickable VScan, NFC, tamper and ledger hotspots
+- Added accessible contextual technology dialogs
+- Added reduced-motion support
+- Connected the splash VScan action to the real camera scanner modal
+- Added production-integrity copy so depicted hardware does not imply an unconfigured integration is live
+
+### Branding update
 
 - Added approved VCA slab-label branding asset
 - Added approved VCA splash-screen branding asset
 - Added approved VCA slab-showcase branding asset
-- Updated the splash screen to use the approved VCA branding artwork
 - Added the canonical slab label to the home experience
 - Added slab showcase presentation to the home experience
 - Removed prototype-style unsupported metrics/claims from the home experience
 - Changed NFC CTA language from simulation wording to verification wording
-- Updated public product copy to distinguish implemented functionality from configured integrations
 
 ### QR + NFC trust layer
 
