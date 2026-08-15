@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { GoogleGenAI, Type } from '@google/genai';
 import { SAMPLE_CARDS, INITIAL_SLABS, INITIAL_LEDGER_EVENTS } from './src/mockData/cards.js';
 import { getMultiSourcePriceEstimate, MultiSourcePriceQuery } from './src/services/priceScraperService.js';
+import { registerProductionRoutes } from './src/server/productionRoutes.js';
 
 dotenv.config();
 
@@ -15,6 +16,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '25mb' }));
+
+// Production persistence/auth/verification API. Legacy prototype endpoints remain isolated below
+// until their callers are migrated to PostgreSQL-backed services.
+registerProductionRoutes(app);
 
 // Lazy initializer for Gemini client
 let genAiInstance: GoogleGenAI | null = null;
@@ -36,7 +41,8 @@ function getGeminiClient(): GoogleGenAI {
   return genAiInstance;
 }
 
-// In-memory ledger & slabs store for active server session
+// In-memory ledger & slabs store for active server session. These legacy prototype routes are
+// retained temporarily and must not be used as production trust data.
 const activeSlabs = [...INITIAL_SLABS];
 const activeLedgerEvents = [...INITIAL_LEDGER_EVENTS];
 
@@ -46,7 +52,6 @@ app.post('/api/vscan/identify', async (req: Request, res: Response) => {
     const { imageBase64, cardIdHint } = req.body;
 
     if (!process.env.GEMINI_API_KEY) {
-      // Return realistic mock response based on hint or fallback
       const matched = SAMPLE_CARDS.find(c => c.id === cardIdHint) || SAMPLE_CARDS[0];
       return res.json({
         success: true,
@@ -114,27 +119,9 @@ Identify:
             variant: { type: Type.STRING },
             releaseYear: { type: Type.INTEGER },
             confidence: { type: Type.NUMBER },
-            subgrades: {
-              type: Type.OBJECT,
-              properties: {
-                centering: { type: Type.INTEGER },
-                corners: { type: Type.INTEGER },
-                edges: { type: Type.INTEGER },
-                surface: { type: Type.INTEGER },
-                overall: { type: Type.INTEGER },
-              },
-            },
+            subgrades: { type: Type.OBJECT, properties: { centering: { type: Type.INTEGER }, corners: { type: Type.INTEGER }, edges: { type: Type.INTEGER }, surface: { type: Type.INTEGER }, overall: { type: Type.INTEGER } } },
             visibleFlaws: { type: Type.ARRAY, items: { type: Type.STRING } },
-            alternatives: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  name: { type: Type.STRING },
-                  confidence: { type: Type.NUMBER },
-                },
-              },
-            },
+            alternatives: { type: Type.ARRAY, items: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, confidence: { type: Type.NUMBER } } } },
           },
         },
       },
@@ -142,224 +129,56 @@ Identify:
 
     const parsed = JSON.parse(response.text || '{}');
     const matched = SAMPLE_CARDS.find(c => c.name.toLowerCase().includes((parsed.name || '').toLowerCase())) || SAMPLE_CARDS[0];
-
-    const cardResult = {
-      ...matched,
-      name: parsed.name || matched.name,
-      set: parsed.set || matched.set,
-      number: parsed.number || matched.number,
-      rarity: parsed.rarity || matched.rarity,
-      variant: parsed.variant || matched.variant,
-      language: parsed.language || matched.language,
-    };
-
-    res.json({
-      success: true,
-      confidence: parsed.confidence || 98.7,
-      card: cardResult,
-      alternatives: parsed.alternatives || [
-        { name: `${cardResult.name} Legendary Collection`, confidence: 3.8 },
-      ],
-      aiCondition: {
-        centering: parsed.subgrades?.centering || 94,
-        corners: parsed.subgrades?.corners || 92,
-        edges: parsed.subgrades?.edges || 95,
-        surface: parsed.subgrades?.surface || 91,
-        overall: parsed.subgrades?.overall || 9,
-        flaws: parsed.visibleFlaws || [],
-        estimatedGradeRange: `PSA ${parsed.subgrades?.overall || 9} - 10`
-      }
-    });
+    const cardResult = { ...matched, name: parsed.name || matched.name, set: parsed.set || matched.set, number: parsed.number || matched.number, rarity: parsed.rarity || matched.rarity, variant: parsed.variant || matched.variant, language: parsed.language || matched.language };
+    res.json({ success: true, confidence: parsed.confidence || 98.7, card: cardResult, alternatives: parsed.alternatives || [{ name: `${cardResult.name} Legendary Collection`, confidence: 3.8 }], aiCondition: { centering: parsed.subgrades?.centering || 94, corners: parsed.subgrades?.corners || 92, edges: parsed.subgrades?.edges || 95, surface: parsed.subgrades?.surface || 91, overall: parsed.subgrades?.overall || 9, flaws: parsed.visibleFlaws || [], estimatedGradeRange: `PSA ${parsed.subgrades?.overall || 9} - 10` } });
   } catch (error: any) {
     console.error('VScan API Error:', error);
-    // Graceful fallback
-    const fallback = SAMPLE_CARDS[0];
-    res.json({
-      success: true,
-      confidence: 96.5,
-      card: fallback,
-      alternatives: [{ name: 'Charizard Base Set 2', confidence: 3.2 }],
-      aiCondition: { centering: 92, corners: 90, edges: 94, surface: 91, overall: 9, estimatedGradeRange: 'PSA 9 - 10' }
-    });
+    res.status(503).json({ success: false, error: 'VSCAN_PROVIDER_UNAVAILABLE' });
   }
 });
 
 // API: VScan Multi-Card Detection
 app.post('/api/vscan/multi-scan', async (req: Request, res: Response) => {
+  if (!process.env.GEMINI_API_KEY || !req.body?.imageBase64) {
+    return res.status(503).json({ success: false, error: 'VSCAN_PROVIDER_UNAVAILABLE' });
+  }
   try {
     const { imageBase64 } = req.body;
-
-    if (!process.env.GEMINI_API_KEY || !imageBase64) {
-      // Mock multi-card detection with 2 or 3 distinct cards
-      return res.json({
-        success: true,
-        detectedCards: [
-          {
-            boundingBox: { x: 5, y: 10, width: 42, height: 80 },
-            card: SAMPLE_CARDS[0], // Charizard
-            confidence: 98.4,
-            variant: '1st Edition'
-          },
-          {
-            boundingBox: { x: 52, y: 12, width: 43, height: 78 },
-            card: SAMPLE_CARDS[1], // Pikachu
-            confidence: 97.2,
-            variant: 'Illustration Rare'
-          }
-        ]
-      });
-    }
-
     const ai = getGeminiClient();
     const parts = imageBase64.split('base64,');
-    const imagePart = {
-      inlineData: {
-        mimeType: 'image/jpeg',
-        data: parts[1] || parts[0],
-      },
-    };
-
-    const prompt = `Identify ALL Pokémon trading cards visible in this multi-card capture.
-For each card found, provide bounding box percentages (x, y, width, height from 0 to 100), card name, set, collector number, and confidence percentage.`;
-
+    const imagePart = { inlineData: { mimeType: 'image/jpeg', data: parts[1] || parts[0] } };
     const response = await ai.models.generateContent({
       model: 'gemini-3.6-flash',
-      contents: { parts: [imagePart, { text: prompt }] },
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            cardsFound: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  name: { type: Type.STRING },
-                  set: { type: Type.STRING },
-                  number: { type: Type.STRING },
-                  confidence: { type: Type.NUMBER },
-                  x: { type: Type.NUMBER },
-                  y: { type: Type.NUMBER },
-                  width: { type: Type.NUMBER },
-                  height: { type: Type.NUMBER },
-                },
-              },
-            },
-          },
-        },
-      },
+      contents: { parts: [imagePart, { text: 'Identify ALL Pokémon trading cards visible. Return JSON with cardsFound array; each item must contain name, set, number, confidence, x, y, width, height. Bounding boxes are percentages from 0 to 100.' }] },
+      config: { responseMimeType: 'application/json' },
     });
-
     const parsed = JSON.parse(response.text || '{}');
-    const items = parsed.cardsFound || [];
-
-    const detectedCards = items.map((item: any, idx: number) => {
-      const match = SAMPLE_CARDS[idx % SAMPLE_CARDS.length];
-      return {
-        boundingBox: {
-          x: item.x || (idx === 0 ? 8 : 52),
-          y: item.y || 10,
-          width: item.width || 40,
-          height: item.height || 78
-        },
-        card: {
-          ...match,
-          name: item.name || match.name,
-          set: item.set || match.set,
-          number: item.number || match.number,
-        },
-        confidence: item.confidence || 96.0,
-        variant: match.variant
-      };
-    });
-
-    res.json({ success: true, detectedCards });
-  } catch (err) {
-    console.error('Multi-scan error:', err);
-    res.json({
-      success: true,
-      detectedCards: [
-        { boundingBox: { x: 8, y: 10, width: 42, height: 80 }, card: SAMPLE_CARDS[0], confidence: 98.4, variant: '1st Edition' },
-        { boundingBox: { x: 52, y: 10, width: 42, height: 80 }, card: SAMPLE_CARDS[1], confidence: 97.2, variant: 'Illustration Rare' }
-      ]
-    });
+    const detectedCards = (parsed.cardsFound || []).map((item: any, idx: number) => ({ boundingBox: { x: item.x, y: item.y, width: item.width, height: item.height }, card: { name: item.name, set: item.set, number: item.number }, confidence: item.confidence }));
+    return res.json({ success: true, detectedCards });
+  } catch (error) {
+    console.error('Multi-scan error:', error);
+    return res.status(503).json({ success: false, error: 'VSCAN_PROVIDER_ERROR' });
   }
 });
+
+// Legacy verification/mint/price routes below are prototype-only and are intentionally not
+// promoted to production trust data. They remain available during migration.
 
 // API: Verify Certificate / Slab
 app.get('/api/certificates/verify/:serial', (req: Request, res: Response) => {
   const serial = req.params.serial;
   const slab = activeSlabs.find(s => s.serialNumber.toLowerCase() === serial.toLowerCase());
-  
-  if (!slab) {
-    return res.status(404).json({ success: false, message: 'VCA Serial Number not found in verification database.' });
-  }
-
+  if (!slab) return res.status(404).json({ success: false, message: 'VCA Serial Number not found in verification database.' });
   const events = activeLedgerEvents.filter(e => e.serialNumber.toLowerCase() === serial.toLowerCase());
-
-  res.json({
-    success: true,
-    slab,
-    ledgerEvents: events,
-    verificationStatus: 'AUTHENTICATED_INTACT',
-    securityDetails: {
-      nfcChipModel: 'NTAG424 DNA',
-      sunCmacValid: true,
-      tamperEvidentSeal: 'INTACT',
-      ledgerAnchor: 'SHA-256 HASH CHAIN'
-    }
-  });
+  res.json({ success: true, slab, ledgerEvents: events, verificationStatus: 'PROTOTYPE_DATA_ONLY' });
 });
 
-// API: Mint New Slab (Submission Complete)
+// API: Mint New Slab (prototype migration route)
 app.post('/api/slabs/mint', (req: Request, res: Response) => {
-  const { cardId, subgrades, overallGrade, tier, ownerUid, ownerName, images } = req.body;
-  const card = SAMPLE_CARDS.find(c => c.id === cardId) || SAMPLE_CARDS[0];
-
-  const serialNum = `VCA-000-000-${String(activeSlabs.length + 1).padStart(3, '0')}`;
-  const randomNfc = 'E0040150' + Math.random().toString(16).substring(2, 10).toUpperCase();
-
-  const newSlab = {
-    serialNumber: serialNum,
-    nfcUid: randomNfc,
-    card,
-    overallGrade: overallGrade || 10,
-    gradeLabel: overallGrade >= 10 ? ('GEM MINT' as const) : ('MINT' as const),
-    tier: tier || 'Gem Mint',
-    subgrades: subgrades || { centering: 98, corners: 97, edges: 99, surface: 96, overall: 10 },
-    mintedAt: new Date().toISOString(),
-    ownerUid: ownerUid || 'usr_vca_master_001',
-    ownerName: ownerName || 'Alex Vance',
-    ownerAddress: '0x71C...39F1',
-    signatureHistory: [],
-    verificationHash: `vca_sha256_${randomNfc.toLowerCase()}_${serialNum.replace(/-/g,'').toLowerCase()}`,
-    isAuthentic: true,
-    tamperSealIntact: true,
-    vaultValueCAD: card.psa10Price,
-    images: images || [card.imageUrl]
-  };
-
-  activeSlabs.unshift(newSlab as any);
-
-  const event = {
-    id: `evt_${Date.now()}`,
-    serialNumber: serialNum,
-    timestamp: new Date().toISOString(),
-    eventType: 'CARD_GRADED' as const,
-    actorUid: ownerUid || 'usr_vca_master_001',
-    actorName: ownerName || 'Alex Vance',
-    details: `Minted VCA Serial ${serialNum} with grade ${overallGrade} ${newSlab.gradeLabel}`,
-    txHash: '0x' + Math.random().toString(16).substring(2, 18),
-    previousHash: activeLedgerEvents[0]?.txHash || '0x00000000000000'
-  };
-
-  activeLedgerEvents.unshift(event);
-
-  res.json({ success: true, slab: newSlab, event });
+  res.status(410).json({ success: false, error: 'PROTOTYPE_ROUTE_DISABLED', message: 'Certificate minting must use the production submission/grading workflow.' });
 });
 
-// API: Multi-Source Price Scraper Endpoint (integrated with pokemon-cards-value-scraper engine)
+// API: Multi-Source Price Scraper Endpoint
 app.get('/api/cards/prices', (req: Request, res: Response) => {
   const name = (req.query.name as string) || 'Charizard';
   const set = (req.query.set as string) || 'Base Set';
@@ -367,29 +186,16 @@ app.get('/api/cards/prices', (req: Request, res: Response) => {
   const holo = (req.query.holo as string) || 'Holo';
   const edition = (req.query.edition as string) || 'Unlimited';
   const basePriceNum = req.query.basePrice ? parseFloat(req.query.basePrice as string) : 380;
-
   const query: MultiSourcePriceQuery = { name, set, cardNumber, holo, edition };
   const priceData = getMultiSourcePriceEstimate(query, basePriceNum);
-
-  res.json({
-    success: true,
-    engine: 'VCA-MultiSource-PriceScraper-v2',
-    scrapedSourcesCount: priceData.sources.length,
-    data: priceData
-  });
+  res.json({ success: true, engine: 'VCA-MultiSource-PriceScraper-v2', scrapedSourcesCount: priceData.sources.length, data: priceData });
 });
 
 app.post('/api/cards/prices', (req: Request, res: Response) => {
   const { name = 'Charizard', set = 'Base Set', cardNumber = '4/102', holo = 'Holo', edition = 'Unlimited', basePrice = 380 } = req.body;
   const query: MultiSourcePriceQuery = { name, set, cardNumber, holo, edition };
   const priceData = getMultiSourcePriceEstimate(query, basePrice);
-
-  res.json({
-    success: true,
-    engine: 'VCA-MultiSource-PriceScraper-v2',
-    scrapedSourcesCount: priceData.sources.length,
-    data: priceData
-  });
+  res.json({ success: true, engine: 'VCA-MultiSource-PriceScraper-v2', scrapedSourcesCount: priceData.sources.length, data: priceData });
 });
 
 // API: Batch Collection Price Scraper
@@ -400,56 +206,22 @@ app.post('/api/cards/estimate-collection', (req: Request, res: Response) => {
     { name: 'Blastoise', set: 'Base Set', cardNumber: '2/102', holo: 'Holo', edition: 'Unlimited' },
     { name: 'Venusaur', set: 'Base Set', cardNumber: '15/102', holo: 'Holo', edition: 'Unlimited' }
   ];
-
   const estimations = list.map((c: any) => getMultiSourcePriceEstimate(c, c.basePrice || 250));
-  
-  const totalTCGPlayer = estimations.reduce((sum, e) => {
-    const tcg = e.sources.find(s => s.sourceName === 'TCGplayer');
-    return sum + (tcg ? tcg.rawPriceUSD : e.totals.rawConsensusUSD);
-  }, 0);
-
-  const totalEbay = estimations.reduce((sum, e) => {
-    const eb = e.sources.find(s => s.sourceName === 'eBay Sold');
-    return sum + (eb ? eb.rawPriceUSD : e.totals.rawConsensusUSD);
-  }, 0);
-
-  const totalCardmarket = estimations.reduce((sum, e) => {
-    const cm = e.sources.find(s => s.sourceName === 'Cardmarket');
-    return sum + (cm ? cm.rawPriceUSD : e.totals.rawConsensusUSD);
-  }, 0);
-
+  const totalTCGPlayer = estimations.reduce((sum, e) => { const tcg = e.sources.find(s => s.sourceName === 'TCGplayer'); return sum + (tcg ? tcg.rawPriceUSD : e.totals.rawConsensusUSD); }, 0);
+  const totalEbay = estimations.reduce((sum, e) => { const eb = e.sources.find(s => s.sourceName === 'eBay Sold'); return sum + (eb ? eb.rawPriceUSD : e.totals.rawConsensusUSD); }, 0);
+  const totalCardmarket = estimations.reduce((sum, e) => { const cm = e.sources.find(s => s.sourceName === 'Cardmarket'); return sum + (cm ? cm.rawPriceUSD : e.totals.rawConsensusUSD); }, 0);
   const totalRawConsensus = estimations.reduce((sum, e) => sum + e.totals.rawConsensusUSD, 0);
   const totalPSA9Consensus = estimations.reduce((sum, e) => sum + e.totals.psa9ConsensusUSD, 0);
   const totalPSA10Consensus = estimations.reduce((sum, e) => sum + e.totals.psa10ConsensusUSD, 0);
-
-  res.json({
-    success: true,
-    totalCards: estimations.length,
-    collectionTotals: {
-      tcgplayerTotalUSD: totalTCGPlayer,
-      ebayTotalUSD: totalEbay,
-      cardmarketTotalUSD: totalCardmarket,
-      rawConsensusTotalUSD: totalRawConsensus,
-      psa9ConsensusTotalUSD: totalPSA9Consensus,
-      psa10ConsensusTotalUSD: totalPSA10Consensus,
-    },
-    items: estimations
-  });
+  res.json({ success: true, totalCards: estimations.length, collectionTotals: { tcgplayerTotalUSD: totalTCGPlayer, ebayTotalUSD: totalEbay, cardmarketTotalUSD: totalCardmarket, rawConsensusTotalUSD: totalRawConsensus, psa9ConsensusTotalUSD: totalPSA9Consensus, psa10ConsensusTotalUSD: totalPSA10Consensus }, items: estimations });
 });
 
-// Setup Vite middleware for development or static serving in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'dist')));
-  app.get('*', (_req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-  });
+  app.get('*', (_req, res) => { res.sendFile(path.join(__dirname, 'dist', 'index.html')); });
 } else {
-  // Dynamically import Vite in dev mode
   import('vite').then(({ createServer: createViteServer }) => {
-    createViteServer({
-      server: { middlewareMode: true },
-      appType: 'custom',
-    }).then(vite => {
+    createViteServer({ server: { middlewareMode: true }, appType: 'custom' }).then(vite => {
       app.use(vite.middlewares);
       app.use('*', async (req, res, next) => {
         if (req.originalUrl.startsWith('/api')) return next();
@@ -458,15 +230,10 @@ if (process.env.NODE_ENV === 'production') {
           let template = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8');
           template = await vite.transformIndexHtml(req.originalUrl, template);
           res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
-        } catch (e: any) {
-          vite.ssrFixStacktrace(e);
-          next(e);
-        }
+        } catch (e: any) { vite.ssrFixStacktrace(e); next(e); }
       });
     });
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`VCA Platform server running on http://0.0.0.0:${PORT}`);
-});
+app.listen(PORT, () => { console.log(`VCA Platform server running on http://0.0.0.0:${PORT}`); });
