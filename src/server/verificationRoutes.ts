@@ -1,15 +1,11 @@
-import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import type { Express, NextFunction, Request, Response } from 'express';
 import { prisma } from '../../packages/database/src/client.js';
 
 const SESSION_COOKIE = 'vca_session';
-
 type AuthenticatedRequest = Request & { userId?: string; userRole?: string };
 
-function hashToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex');
-}
-
+function hashToken(token: string): string { return createHash('sha256').update(token).digest('hex'); }
 function parseCookies(header?: string): Record<string, string> {
   if (!header) return {};
   return Object.fromEntries(header.split(';').map(part => {
@@ -24,25 +20,12 @@ async function requireStaff(req: AuthenticatedRequest, res: Response, next: Next
     const bearer = req.header('authorization')?.replace(/^Bearer\s+/i, '');
     const cookies = parseCookies(req.header('cookie'));
     const token = bearer || cookies[SESSION_COOKIE];
-    if (!token) {
-      res.status(401).json({ success: false, error: 'AUTH_REQUIRED' });
-      return;
-    }
+    if (!token) { res.status(401).json({ success: false, error: 'AUTH_REQUIRED' }); return; }
     const session = await prisma.session.findUnique({ where: { tokenHash: hashToken(token) }, include: { user: true } });
-    if (!session || session.expiresAt <= new Date() || session.user.status !== 'ACTIVE') {
-      res.status(401).json({ success: false, error: 'INVALID_SESSION' });
-      return;
-    }
-    if (session.user.role !== 'GRADER' && session.user.role !== 'ADMIN') {
-      res.status(403).json({ success: false, error: 'STAFF_PERMISSION_REQUIRED' });
-      return;
-    }
-    req.userId = session.userId;
-    req.userRole = session.user.role;
-    next();
-  } catch (error) {
-    next(error);
-  }
+    if (!session || session.expiresAt <= new Date() || session.user.status !== 'ACTIVE') { res.status(401).json({ success: false, error: 'INVALID_SESSION' }); return; }
+    if (session.user.role !== 'GRADER' && session.user.role !== 'ADMIN') { res.status(403).json({ success: false, error: 'STAFF_PERMISSION_REQUIRED' }); return; }
+    req.userId = session.userId; req.userRole = session.user.role; next();
+  } catch (error) { next(error); }
 }
 
 async function audit(actorId: string | null, action: string, entityType: string, entityId: string, metadata?: unknown): Promise<void> {
@@ -57,61 +40,30 @@ function publicCertificate(certificate: any) {
     status: certificate.status,
     finalGrade: certificate.finalGrade,
     certifiedAt: certificate.certifiedAt,
-    card: card ? {
-      name: card.name,
-      collectorNo: card.collectorNo,
-      variant: card.variant,
-      language: card.language,
-      set: card.set ? { name: card.set.name, brand: card.set.brand, year: card.set.year } : null,
-    } : null,
-    slab: certificate.slab ? {
-      status: certificate.slab.status,
-      model: certificate.slab.model,
-      nfcEnabled: Boolean(certificate.nfcRecord),
-    } : null,
-    nfc: certificate.nfcRecord ? {
-      securityLevel: certificate.nfcRecord.securityLevel,
-      tamperStatus: certificate.nfcRecord.tamperStatus,
-      lastVerifiedAt: certificate.nfcRecord.lastVerifiedAt,
-    } : null,
+    card: card ? { name: card.name, collectorNo: card.collectorNo, variant: card.variant, language: card.language, set: card.set ? { name: card.set.name, brand: card.set.brand, year: card.set.year } : null } : null,
+    slab: certificate.slab ? { status: certificate.slab.status, model: certificate.slab.model, nfcEnabled: Boolean(certificate.nfcRecord) } : null,
+    nfc: certificate.nfcRecord ? { securityLevel: certificate.nfcRecord.securityLevel, tamperStatus: certificate.nfcRecord.tamperStatus, lastVerifiedAt: certificate.nfcRecord.lastVerifiedAt } : null,
   };
 }
 
 export function registerVerificationRoutes(app: Express): void {
-  // Create or return the non-secret public token used to construct the QR URL.
-  // The token itself is random and stored server-side; the certificate serial is not the security token.
   app.post('/api/certificates/:serial/qr', requireStaff, async (req: AuthenticatedRequest, res, next) => {
     try {
       const certificate = await prisma.certificate.findUnique({ where: { serialNo: req.params.serial } });
-      if (!certificate) {
-        res.status(404).json({ success: false, error: 'CERTIFICATE_NOT_FOUND' });
-        return;
-      }
-      if (certificate.status === 'REVOKED') {
-        res.status(409).json({ success: false, error: 'CERTIFICATE_REVOKED' });
-        return;
-      }
+      if (!certificate) { res.status(404).json({ success: false, error: 'CERTIFICATE_NOT_FOUND' }); return; }
+      if (certificate.status === 'REVOKED') { res.status(409).json({ success: false, error: 'CERTIFICATE_REVOKED' }); return; }
       const existing = await prisma.qRRecord.findUnique({ where: { certificateId: certificate.id } });
-      const record = existing ?? await prisma.qRRecord.create({
-        data: { certificateId: certificate.id, publicToken: randomBytes(32).toString('base64url') },
-      });
+      const record = existing ?? await prisma.qRRecord.create({ data: { certificateId: certificate.id, publicToken: randomBytes(32).toString('base64url') } });
       await audit(req.userId!, existing ? 'QR_RECORD_RETRIEVED' : 'QR_RECORD_CREATED', 'QRRecord', record.id, { certificateId: certificate.id });
       const baseUrl = process.env.PUBLIC_VERIFY_URL || `${req.protocol}://${req.get('host')}`;
       res.status(existing ? 200 : 201).json({ success: true, qr: { token: record.publicToken, verificationUrl: `${baseUrl.replace(/\/$/, '')}/verify/qr/${record.publicToken}` } });
     } catch (error) { next(error); }
   });
 
-  // Public QR verification. No ownership, email, address, or internal grader information is returned.
   app.get('/api/verify/qr/:token', async (req, res, next) => {
     try {
-      const record = await prisma.qRRecord.findUnique({
-        where: { publicToken: req.params.token },
-        include: { certificate: { include: { gradingReport: { include: { submission: { include: { card: { include: { set: true } } } } } }, slab: true, nfcRecord: true } } },
-      });
-      if (!record || !record.active) {
-        res.status(404).json({ success: false, verificationStatus: 'NOT_FOUND' });
-        return;
-      }
+      const record = await prisma.qRRecord.findUnique({ where: { publicToken: req.params.token }, include: { certificate: { include: { gradingReport: { include: { submission: { include: { card: { include: { set: true } } } } } }, slab: true, nfcRecord: true } } } });
+      if (!record || !record.active) { res.status(404).json({ success: false, verificationStatus: 'NOT_FOUND' }); return; }
       await prisma.qRRecord.update({ where: { id: record.id }, data: { scanCount: { increment: 1 }, lastVerifiedAt: new Date() } });
       await audit(null, 'QR_VERIFICATION', 'Certificate', record.certificateId, { qrRecordId: record.id });
       const certificate = record.certificate;
@@ -120,56 +72,29 @@ export function registerVerificationRoutes(app: Express): void {
     } catch (error) { next(error); }
   });
 
-  // Bind a physical NFC identifier to an existing certificate/slab. This records association; it does not claim cryptographic security.
   app.post('/api/nfc/bind', requireStaff, async (req: AuthenticatedRequest, res, next) => {
     try {
       const serialNo = String(req.body?.serialNo || '').trim();
       const identifier = String(req.body?.identifier || '').trim();
       const securityLevel = req.body?.securityLevel === 'CRYPTOGRAPHIC' ? 'CRYPTOGRAPHIC' : 'IDENTIFIER_ONLY';
       const tamperStatus = ['UNKNOWN', 'CLEAR', 'SUSPECTED', 'TAMPERED'].includes(req.body?.tamperStatus) ? req.body.tamperStatus : 'UNKNOWN';
-      if (!serialNo || !identifier) {
-        res.status(400).json({ success: false, error: 'SERIAL_AND_IDENTIFIER_REQUIRED' });
-        return;
-      }
+      if (!serialNo || !identifier) { res.status(400).json({ success: false, error: 'SERIAL_AND_IDENTIFIER_REQUIRED' }); return; }
       const certificate = await prisma.certificate.findUnique({ where: { serialNo }, include: { slab: true } });
-      if (!certificate) {
-        res.status(404).json({ success: false, error: 'CERTIFICATE_NOT_FOUND' });
-        return;
-      }
-      if (certificate.status === 'REVOKED') {
-        res.status(409).json({ success: false, error: 'CERTIFICATE_REVOKED' });
-        return;
-      }
-      if (!certificate.slab) {
-        res.status(409).json({ success: false, error: 'SLAB_REQUIRED_BEFORE_NFC_BINDING' });
-        return;
-      }
+      if (!certificate) { res.status(404).json({ success: false, error: 'CERTIFICATE_NOT_FOUND' }); return; }
+      if (certificate.status === 'REVOKED') { res.status(409).json({ success: false, error: 'CERTIFICATE_REVOKED' }); return; }
+      if (!certificate.slab) { res.status(409).json({ success: false, error: 'SLAB_REQUIRED_BEFORE_NFC_BINDING' }); return; }
       const existingIdentifier = await prisma.nFCRecord.findUnique({ where: { identifier } });
-      if (existingIdentifier && existingIdentifier.certificateId !== certificate.id) {
-        res.status(409).json({ success: false, error: 'NFC_IDENTIFIER_ALREADY_BOUND' });
-        return;
-      }
-      const record = await prisma.nFCRecord.upsert({
-        where: { certificateId: certificate.id },
-        create: { certificateId: certificate.id, slabId: certificate.slab.id, identifier, securityLevel, tamperStatus },
-        update: { slabId: certificate.slab.id, identifier, securityLevel, tamperStatus },
-      });
+      if (existingIdentifier && existingIdentifier.certificateId !== certificate.id) { res.status(409).json({ success: false, error: 'NFC_IDENTIFIER_ALREADY_BOUND' }); return; }
+      const record = await prisma.nFCRecord.upsert({ where: { certificateId: certificate.id }, create: { certificateId: certificate.id, slabId: certificate.slab.id, identifier, securityLevel, tamperStatus }, update: { slabId: certificate.slab.id, identifier, securityLevel, tamperStatus } });
       await audit(req.userId!, 'NFC_BOUND', 'NFCRecord', record.id, { certificateId: certificate.id, securityLevel, tamperStatus });
       res.status(201).json({ success: true, nfc: { id: record.id, identifier: record.identifier, securityLevel: record.securityLevel, tamperStatus: record.tamperStatus, certificateSerial: certificate.serialNo } });
     } catch (error) { next(error); }
   });
 
-  // NFC identifier verification. IDENTIFIER_ONLY means the tag identifies the slab but does not cryptographically prove authenticity.
   app.get('/api/nfc/verify/:identifier', async (req, res, next) => {
     try {
-      const record = await prisma.nFCRecord.findUnique({
-        where: { identifier: req.params.identifier },
-        include: { certificate: { include: { gradingReport: { include: { submission: { include: { card: { include: { set: true } } } } } }, slab: true } } },
-      });
-      if (!record) {
-        res.status(404).json({ success: false, verificationStatus: 'NFC_IDENTIFIER_NOT_REGISTERED' });
-        return;
-      }
+      const record = await prisma.nFCRecord.findUnique({ where: { identifier: req.params.identifier }, include: { certificate: { include: { gradingReport: { include: { submission: { include: { card: { include: { set: true } } } } } }, slab: true, nfcRecord: true } } } });
+      if (!record) { res.status(404).json({ success: false, verificationStatus: 'NFC_IDENTIFIER_NOT_REGISTERED' }); return; }
       await prisma.nFCRecord.update({ where: { id: record.id }, data: { lastVerifiedAt: new Date() } });
       await audit(null, 'NFC_VERIFICATION', 'NFCRecord', record.id, { securityLevel: record.securityLevel });
       const certStatus = record.certificate.status;
@@ -178,14 +103,10 @@ export function registerVerificationRoutes(app: Express): void {
     } catch (error) { next(error); }
   });
 
-  // Optional tamper-status update from an authorized physical inspection workflow.
   app.post('/api/nfc/:identifier/tamper-status', requireStaff, async (req: AuthenticatedRequest, res, next) => {
     try {
       const tamperStatus = req.body?.tamperStatus;
-      if (!['UNKNOWN', 'CLEAR', 'SUSPECTED', 'TAMPERED'].includes(tamperStatus)) {
-        res.status(400).json({ success: false, error: 'INVALID_TAMPER_STATUS' });
-        return;
-      }
+      if (!['UNKNOWN', 'CLEAR', 'SUSPECTED', 'TAMPERED'].includes(tamperStatus)) { res.status(400).json({ success: false, error: 'INVALID_TAMPER_STATUS' }); return; }
       const record = await prisma.nFCRecord.update({ where: { identifier: req.params.identifier }, data: { tamperStatus } });
       await audit(req.userId!, 'NFC_TAMPER_STATUS_UPDATED', 'NFCRecord', record.id, { tamperStatus });
       res.json({ success: true, nfc: { identifier: record.identifier, tamperStatus: record.tamperStatus, updatedAt: record.updatedAt } });
