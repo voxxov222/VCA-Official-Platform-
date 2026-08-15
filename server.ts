@@ -7,6 +7,7 @@ import { SAMPLE_CARDS, INITIAL_SLABS, INITIAL_LEDGER_EVENTS } from './src/mockDa
 import { getMultiSourcePriceEstimate, MultiSourcePriceQuery } from './src/services/priceScraperService.js';
 import { registerProductionRoutes } from './src/server/productionRoutes.js';
 import { registerVerificationRoutes } from './src/server/verificationRoutes.js';
+import { registerVscanMarketRoutes } from './src/server/vscanMarketRoutes.js';
 
 dotenv.config();
 
@@ -18,10 +19,9 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '25mb' }));
 
-// Production persistence/auth/grading/verification API. Legacy prototype endpoints remain isolated below
-// until their callers are migrated to PostgreSQL-backed services.
 registerProductionRoutes(app);
 registerVerificationRoutes(app);
+registerVscanMarketRoutes(app);
 
 let genAiInstance: GoogleGenAI | null = null;
 function getGeminiClient(): GoogleGenAI {
@@ -38,19 +38,17 @@ const activeLedgerEvents = [...INITIAL_LEDGER_EVENTS];
 
 app.post('/api/vscan/identify', async (req: Request, res: Response) => {
   try {
-    const { imageBase64, cardIdHint } = req.body;
+    const { imageBase64 } = req.body;
     if (!process.env.GEMINI_API_KEY || !imageBase64) return res.status(503).json({ success: false, error: 'VSCAN_PROVIDER_UNAVAILABLE' });
     const ai = getGeminiClient();
-    let imagePart: any;
-    if (imageBase64.includes('base64,')) {
-      const parts = imageBase64.split('base64,');
-      const mime = imageBase64.substring(imageBase64.indexOf(':') + 1, imageBase64.indexOf(';'));
-      imagePart = { inlineData: { mimeType: mime || 'image/jpeg', data: parts[1] } };
-    }
-    const promptText = `Analyze this Pokémon trading card image in high detail for VScan AI. Identify exact Pokémon name, expansion set and release year, collector number, rarity, variant, language, visible condition indicators, visible flaws, and confidence. Return only structured JSON. Do not invent facts when the image is insufficient.`;
-    const response = await ai.models.generateContent({ model: 'gemini-3.6-flash', contents: imagePart ? { parts: [imagePart, { text: promptText }] } : { parts: [{ text: promptText }] }, config: { responseMimeType: 'application/json', responseSchema: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, set: { type: Type.STRING }, number: { type: Type.STRING }, rarity: { type: Type.STRING }, language: { type: Type.STRING }, variant: { type: Type.STRING }, releaseYear: { type: Type.INTEGER }, confidence: { type: Type.NUMBER }, visibleFlaws: { type: Type.ARRAY, items: { type: Type.STRING } } } } } });
+    const parts = imageBase64.split('base64,');
+    const mime = imageBase64.substring(imageBase64.indexOf(':') + 1, imageBase64.indexOf(';')) || 'image/jpeg';
+    const imagePart = { inlineData: { mimeType: mime, data: parts[1] || parts[0] } };
+    const promptText = `Analyze this Pokémon trading card photograph. Identify the exact card only when supported by visible evidence: Pokémon name, expansion set, release year, collector number, rarity, variant/finish, language, and visible condition defects. Return JSON. Never invent a card, set, number, grade, or price. Confidence must reflect image evidence.`;
+    const response = await ai.models.generateContent({ model: 'gemini-3.6-flash', contents: { parts: [imagePart, { text: promptText }] }, config: { responseMimeType: 'application/json', responseSchema: { type: Type.OBJECT, properties: { name: { type: Type.STRING }, set: { type: Type.STRING }, number: { type: Type.STRING }, rarity: { type: Type.STRING }, language: { type: Type.STRING }, variant: { type: Type.STRING }, releaseYear: { type: Type.INTEGER }, confidence: { type: Type.NUMBER }, visibleFlaws: { type: Type.ARRAY, items: { type: Type.STRING } } }, required: ['name', 'confidence'] } } });
     const parsed = JSON.parse(response.text || '{}');
-    res.json({ success: true, confidence: parsed.confidence ?? null, card: parsed, alternatives: [], aiCondition: { flaws: parsed.visibleFlaws || [] }, provider: 'gemini' });
+    if (!parsed.name || typeof parsed.confidence !== 'number') return res.status(422).json({ success: false, error: 'CARD_IDENTIFICATION_UNCERTAIN' });
+    res.json({ success: true, confidence: parsed.confidence, card: parsed, alternatives: [], aiCondition: { flaws: parsed.visibleFlaws || [] }, provider: 'gemini' });
   } catch (error) {
     console.error('VScan API Error:', error);
     res.status(503).json({ success: false, error: 'VSCAN_PROVIDER_ERROR' });
@@ -74,7 +72,6 @@ app.post('/api/vscan/multi-scan', async (req: Request, res: Response) => {
   }
 });
 
-// Legacy prototype verification route retained only as an explicitly non-production fallback.
 app.get('/api/certificates/verify/:serial', (req: Request, res: Response) => {
   const serial = req.params.serial;
   const slab = activeSlabs.find(s => s.serialNumber.toLowerCase() === serial.toLowerCase());
@@ -85,7 +82,6 @@ app.get('/api/certificates/verify/:serial', (req: Request, res: Response) => {
 
 app.post('/api/slabs/mint', (_req: Request, res: Response) => res.status(410).json({ success: false, error: 'PROTOTYPE_ROUTE_DISABLED', message: 'Certificate minting must use the production submission/grading workflow.' }));
 
-// Legacy price endpoints are intentionally retained during migration and are not certification truth.
 app.get('/api/cards/prices', (req: Request, res: Response) => {
   const name = (req.query.name as string) || 'Charizard';
   const set = (req.query.set as string) || 'Base Set';
@@ -107,8 +103,7 @@ app.post('/api/cards/prices', (req: Request, res: Response) => {
 
 app.post('/api/cards/estimate-collection', (req: Request, res: Response) => {
   const { cards = [] } = req.body;
-  const list = cards.length > 0 ? cards : [];
-  const estimations = list.map((c: any) => getMultiSourcePriceEstimate(c, c.basePrice || 250));
+  const estimations = cards.map((c: any) => getMultiSourcePriceEstimate(c, c.basePrice || 250));
   const totalRawConsensus = estimations.reduce((sum, e) => sum + e.totals.rawConsensusUSD, 0);
   const totalPSA9Consensus = estimations.reduce((sum, e) => sum + e.totals.psa9ConsensusUSD, 0);
   const totalPSA10Consensus = estimations.reduce((sum, e) => sum + e.totals.psa10ConsensusUSD, 0);
