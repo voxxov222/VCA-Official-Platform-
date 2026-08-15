@@ -4,17 +4,11 @@ import { prisma } from '../../packages/database/src/client.js';
 
 const SESSION_COOKIE = 'vca_session';
 type AuthenticatedRequest = Request & { userId?: string; userRole?: string };
-
 function hashToken(token: string): string { return createHash('sha256').update(token).digest('hex'); }
 function parseCookies(header?: string): Record<string, string> {
   if (!header) return {};
-  return Object.fromEntries(header.split(';').map(part => {
-    const index = part.indexOf('=');
-    if (index < 0) return [part.trim(), ''];
-    return [part.slice(0, index).trim(), decodeURIComponent(part.slice(index + 1).trim())];
-  }));
+  return Object.fromEntries(header.split(';').map(part => { const index = part.indexOf('='); if (index < 0) return [part.trim(), '']; return [part.slice(0, index).trim(), decodeURIComponent(part.slice(index + 1).trim())]; }));
 }
-
 async function requireStaff(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     const bearer = req.header('authorization')?.replace(/^Bearer\s+/i, '');
@@ -27,11 +21,9 @@ async function requireStaff(req: AuthenticatedRequest, res: Response, next: Next
     req.userId = session.userId; req.userRole = session.user.role; next();
   } catch (error) { next(error); }
 }
-
 async function audit(actorId: string | null, action: string, entityType: string, entityId: string, metadata?: unknown): Promise<void> {
   await prisma.auditLog.create({ data: { actorId, action, entityType, entityId, metadata: metadata as object | undefined } });
 }
-
 function publicCertificate(certificate: any) {
   const card = certificate.gradingReport?.submission?.card;
   return {
@@ -45,7 +37,6 @@ function publicCertificate(certificate: any) {
     nfc: certificate.nfcRecord ? { securityLevel: certificate.nfcRecord.securityLevel, tamperStatus: certificate.nfcRecord.tamperStatus, lastVerifiedAt: certificate.nfcRecord.lastVerifiedAt } : null,
   };
 }
-
 export function registerVerificationRoutes(app: Express): void {
   app.post('/api/certificates/:serial/qr', requireStaff, async (req: AuthenticatedRequest, res, next) => {
     try {
@@ -59,7 +50,6 @@ export function registerVerificationRoutes(app: Express): void {
       res.status(existing ? 200 : 201).json({ success: true, qr: { token: record.publicToken, verificationUrl: `${baseUrl.replace(/\/$/, '')}/verify/qr/${record.publicToken}` } });
     } catch (error) { next(error); }
   });
-
   app.get('/api/verify/qr/:token', async (req, res, next) => {
     try {
       const record = await prisma.qRRecord.findUnique({ where: { publicToken: req.params.token }, include: { certificate: { include: { gradingReport: { include: { submission: { include: { card: { include: { set: true } } } } } }, slab: true, nfcRecord: true } } } });
@@ -71,7 +61,6 @@ export function registerVerificationRoutes(app: Express): void {
       res.json({ success: true, verificationStatus, certificate: publicCertificate(certificate), verifiedAt: new Date().toISOString() });
     } catch (error) { next(error); }
   });
-
   app.post('/api/nfc/bind', requireStaff, async (req: AuthenticatedRequest, res, next) => {
     try {
       const serialNo = String(req.body?.serialNo || '').trim();
@@ -90,19 +79,18 @@ export function registerVerificationRoutes(app: Express): void {
       res.status(201).json({ success: true, nfc: { id: record.id, identifier: record.identifier, securityLevel: record.securityLevel, tamperStatus: record.tamperStatus, certificateSerial: certificate.serialNo } });
     } catch (error) { next(error); }
   });
-
   app.get('/api/nfc/verify/:identifier', async (req, res, next) => {
     try {
-      const record = await prisma.nFCRecord.findUnique({ where: { identifier: req.params.identifier }, include: { certificate: { include: { gradingReport: { include: { submission: { include: { card: { include: { set: true } } } } } }, slab: true, nfcRecord: true } } } });
+      const record = await prisma.nFCRecord.findUnique({ where: { identifier: req.params.identifier }, include: { certificate: { include: { gradingReport: { include: { submission: { include: { card: { include: { set: true } } } } } }, slab: true } } } });
       if (!record) { res.status(404).json({ success: false, verificationStatus: 'NFC_IDENTIFIER_NOT_REGISTERED' }); return; }
-      await prisma.nFCRecord.update({ where: { id: record.id }, data: { lastVerifiedAt: new Date() } });
+      const verifiedAt = new Date();
+      await prisma.nFCRecord.update({ where: { id: record.id }, data: { lastVerifiedAt: verifiedAt } });
       await audit(null, 'NFC_VERIFICATION', 'NFCRecord', record.id, { securityLevel: record.securityLevel });
       const certStatus = record.certificate.status;
       const verificationStatus = certStatus === 'REVOKED' ? 'REVOKED' : certStatus === 'SUSPENDED' ? 'SUSPENDED' : record.securityLevel === 'CRYPTOGRAPHIC' ? 'REGISTERED_CRYPTOGRAPHIC' : 'IDENTIFIER_MATCH_ONLY';
-      res.json({ success: true, verificationStatus, certificate: publicCertificate(record.certificate), nfc: { securityLevel: record.securityLevel, tamperStatus: record.tamperStatus, lastVerifiedAt: new Date().toISOString() } });
+      res.json({ success: true, verificationStatus, certificate: publicCertificate(record.certificate), nfc: { securityLevel: record.securityLevel, tamperStatus: record.tamperStatus, lastVerifiedAt: verifiedAt.toISOString() } });
     } catch (error) { next(error); }
   });
-
   app.post('/api/nfc/:identifier/tamper-status', requireStaff, async (req: AuthenticatedRequest, res, next) => {
     try {
       const tamperStatus = req.body?.tamperStatus;
