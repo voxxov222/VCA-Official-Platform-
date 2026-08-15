@@ -1,229 +1,361 @@
 # 🛡️ VCA — VERIFIED CARD AUTHORITY
-### *Next-Generation Collectible Authentication, NFC Smart Slabs, AI Grading & Foilbook Social Network*
+### Production collectible-card authentication, grading, verification, valuation & NFC platform
 
-[![Platform Status](https://img.shields.io/badge/VCA_System-Online_100%25-22d3ee.svg)](#)
-[![NFC Protocol](https://img.shields.io/badge/NFC_Protocol-NTAG424_DNA_CMAC-emerald.svg)](#)
-[![AI Engine](https://img.shields.io/badge/Vision_AI-Gemini_3.6_Multimodal-indigo.svg)](#)
-[![Social Layer](https://img.shields.io/badge/Social_Network-Foilbook_Slabbook-purple.svg)](#)
-[![License](https://img.shields.io/badge/License-MIT-gold.svg)](#)
+VCA (Verified Card Authority) is being built as a production-ready, self-hostable platform for collectible-card authentication, grading, certification, ownership, valuation, portfolios, marketplace workflows, VScan AI, QR verification and NFC-enabled slabs.
 
-**VCA (Verified Card Authority)** is an enterprise-grade collectible trading card grading, authentication, market intelligence, and social ecosystem built specifically for Pokémon card collectors, investors, and hobbyists. 
-
-It seamlessly combines:
-* **VScan AI**: Multimodal Computer Vision card scanner powering automated 10-point VGAS condition scoring (Centering, Corners, Edges, Surface).
-* **NTAG424 DNA Smart Slabs**: Hardware-encrypted NFC smart slabs with dynamic SUN/CMAC verification signatures to eliminate counterfeit slabs and cloned certificates.
-* **Cryptographic Ledger**: SHA-256 hash-chained event ledger tracking complete slab ownership, transfers, digital signatures, and grading history.
-* **Real-Time Market Consensus Engine**: Multi-tier market valuation blending Raw, PSA 9, and PSA 10 sales data with custom 30-day index trendlines.
-* **Foilbook (Slabbook)**: A Facebook-inspired Pokémon collector social network featuring profile customization, image posts, collection showcases, live 1:1 direct messaging, and embedded slab trade proposals.
+> **Production integrity rule:** VCA does not present simulated identification, grading, pricing, NFC verification, payment confirmation, or deployment results as real functionality. External integrations are explicitly marked unavailable until configured and verified.
 
 ---
 
-## 📸 APPLICATION SCREENSHOTS & VISUAL ARCHITECTURE
+## 🚧 Current Production Build Status
 
-### 1. 🛡️ 3D Holographic Smart Slab & Landing Hero
-*Interactive 3D acrylic slab viewer with holographic label stickers, NTAG424 DNA encryption badge, and real-time vault statistics.*
+Development is being performed on the `foundation/production-stack` branch before production release to `main`.
 
-![VCA 3D Holographic Slab & Hero](./docs/hero_3d_slab.svg)
+### Implemented production foundation
 
----
-
-### 2. 📸 VScan AI Camera Scanner & Optical Metric Engine
-*10-step guided optical capture pipeline analyzing front, back, low-angle raking shots, 4 corners, and 4 edges with real-time market comps.*
-
-![VScan AI Camera Scanner](./docs/vscan_ai_scanner.svg)
-
----
-
-### 3. 💬 Foilbook (Slabbook) Collector Social Network & Direct Messenger
-*Facebook-style social hub for Pokémon collectors featuring live chat, profile customization, posts, and embedded verified slab trade proposals.*
-
-![Foilbook Direct Messenger](./docs/foilbook_social.svg)
-
----
-
-## 🖼️ GUIDE: HOW TO ADD YOUR OWN CUSTOM IMAGES TO THIS README
-
-You can easily replace the diagrams above or add your own live web screenshots, camera capture photos, or slab mockups to this `README.md`. Follow these step-by-step methods:
-
-### Method 1: Local Repo Directory (Recommended for Version Control)
-
-1. **Take your screenshot / picture**: Capture your application running in your browser or a photo of your physical card slab.
-2. **Save the image file**: Save it as a PNG or JPG inside the `/docs/` folder in your project directory (e.g., `/docs/my_dashboard_screenshot.png`).
-3. **Reference it in `README.md`**:
-   ```markdown
-   ![My VCA Dashboard](./docs/my_dashboard_screenshot.png)
-   ```
-4. **Commit & Push**:
-   ```bash
-   git add docs/my_dashboard_screenshot.png README.md
-   git commit -m "docs: add custom dashboard screenshot"
-   git push origin main
-   ```
+- PostgreSQL + Prisma relational data layer
+- Database migrations and production migration commands
+- Persistent users, sessions and role-based access control
+- Submission persistence
+- Grading-report persistence
+- Human-grader authorization boundary
+- Certificate issuance and certificate state model
+- Audit logging for trust-sensitive operations
+- Public certificate verification API
+- QR certificate records with unique public verification tokens
+- NFC record binding to certificates/slabs
+- NFC verification security-level model
+- Tamper-status model
+- QR/NFC verification audit events
+- Production Docker/PostgreSQL foundation
+- VScan provider boundary that refuses to fabricate results when a real provider is unavailable
 
 ---
 
-### Method 2: Drag and Drop via GitHub Web Interface (Easiest & Cloud-Hosted)
+## 📸 VScan — Real Camera Card Scanner
 
-1. Open your GitHub repository in your web browser.
-2. Click on **`README.md`** and select the **Edit (pencil icon)** button.
-3. Drag and drop any `.png`, `.jpg`, or `.gif` image directly into the markdown editor text area.
-4. GitHub will automatically upload the image to their secure CDN and generate a URL link like this:
-   ```markdown
-   ![Screen Shot 2026-08-09](https://github.com/user-attachments/assets/xxxx-xxxx-xxxx)
-   ```
-5. Click **Commit changes...** at the top right.
+VScan is designed to use the user's actual phone/tablet camera to photograph a physical card.
 
----
+### Camera workflow
 
-### Method 3: Using Image HTML Tags for Centering and Custom Sizing
-
-If you want custom widths, borders, or centered layouts for your screenshots:
-
-```html
-<p align="center">
-  <img src="./docs/my_dashboard_screenshot.png" alt="VCA Dashboard" width="90%" style="border-radius: 12px; border: 1px solid #22d3ee;" />
-</p>
+```text
+Open VScan
+   ↓
+Request rear-camera permission
+   ↓
+Align physical card in capture frame
+   ↓
+Take real photograph
+   ↓
+Review / retake
+   ↓
+Send image to configured vision provider
+   ↓
+Identify card / set / number / variant when possible
+   ↓
+Retrieve market data from configured provider
+   ↓
+Display RAW / PSA 8 / PSA 9 / PSA 10 values when available
 ```
 
-#### Recommended Image Specifications:
-* **Resolution**: 1920×1080 (1080p) or 2560×1440 (1440p) for high-DPI crispness.
-* **Format**: `.png` (for crisp UI text) or `.svg` (for vector graphics).
-* **Aspect Ratio**: 16:9 for full-screen dashboards, 4:3 for card detail closeups.
+The scanner must never substitute a sample card when the camera or identification provider fails.
 
----
+If a real vision provider is not configured, VScan reports the provider as unavailable rather than inventing an identification.
 
-## ⚡ CORE FEATURE BREAKDOWN
+### Market-value display
 
-### 1. 📸 VScan AI Camera & VGAS 10-Point Condition Scoring
-* **Multimodal Card Recognition**: Powered by Google Gemini 3.6 Vision for instant card identification (Set, Number, Rarity, Illustrator, Language, and Print Variant e.g. 1st Edition, Holo, SIR, Alt Art).
-* **10-Stage Guided Capture**:
-  1. Card Variant Detection
-  2. Front Flat Shot with scanline HUD sweep
-  3. Reverse Flat Shot
-  4. Low-Angle Raking Shots (Left & Bottom Edges for warping/bowing detection)
-  5. Corner Close-Ups (×4) with reticle zoom
-  6. Edge Close-Ups (×4)
-  7. Centering Margins Computation
-  8. AI Condition Summary Breakdown
-  9. Submission Queueing
-  10. NTAG424 Serial Minting (`VCA-XXX-XXX-XXX`)
-* **VGAS Scoring**: Computes subgrades for **Centering**, **Corners**, **Edges**, and **Surface**.
+VScan is designed to display separate market observations for:
 
----
+| Condition | VCA display |
+|---|---|
+| Raw / Ungraded | Provider-backed raw market value |
+| PSA 8 | Provider-backed PSA 8 value when available |
+| PSA 9 | Provider-backed PSA 9 value when available |
+| PSA 10 | Provider-backed PSA 10 value when available |
 
-### 2. 🛈 NTAG424 DNA Encrypted Smart Slabs & Cryptographic Ledger
-* **Hardware CMAC Verification**: Uses Web NFC (`NDEFReader`) to read dynamic SUN/CMAC cryptographic signatures embedded in NTAG424 DNA chips.
-* **Tamper & Clone Detection**: Validates physical slab serial numbers against the append-only ledger to detect cloned labels or physical slab tampering.
-* **Digital Ownership Signatures**: Current slab owners can apply a cryptographic cursive signature directly onto their slab record.
-* **Transfer Certificates**: Generates verifiable PDF-style transfer certificates when transferring or selling slabs.
+Every displayed market observation should include its source and observation timestamp.
 
----
+Third-party market prices are **not guaranteed sale prices** and are kept separate from any future VCA valuation indicator.
 
-### 3. 📊 Investment Dashboard & Vault Analytics
-* **Real-Time Valuation**: Blends Raw, PSA 9, and PSA 10 market prices into a live Vault Index.
-* **Recharts Visualizations**: 30-day valuation performance curves and interactive set allocation donut charts.
-* **Vault Management**: View, filter, and organize owned slabs with quick NFC tap verification checks.
+### VScan external dependencies
 
----
+The camera itself uses browser camera APIs. Card identification and market valuation require configured external providers.
 
-### 4. 💬 Foilbook (Slabbook) Pokémon Collector Social Network
-* **Facebook-Style Social Feed**: Share card pulls, showcase graded slabs, and post updates to the collector community.
-* **Profile Customization**: Custom avatar uploads, cover banners, collector bio, location, and verified trader badges.
-* **Live Direct Messenger**: Real-time 1:1 chat with active online status indicators and embedded slab trade proposals.
+Example production environment variables:
 
----
-
-### 5. 📺 Breaking Market Wire & Real-Time Price Ticker
-* **Scrolling Marquee**: Top-of-page CNN-style ticker streaming real-time sales alerts, auction records, and market movements.
-* **Interactive News Broadcast Room**: Drawer overlay detailing rare card price movements (Charizard 1st Ed, Pikachu 151 SIR, Umbreon VMAX Alt Art).
-
----
-
-### 6. 🛍️ Verified Marketplace & Live Auctions
-* **Live Auction Rooms**: Real-time countdown timers, live bid ticker, watcher counters, and animated high-bid pulses.
-* **Buy-Now & Offer System**: Negotiate trades and purchase verified slabs backed by zero-fraud escrow logs.
-
----
-
-## 🛠️ TECH STACK & SYSTEM DEPENDENCIES
-
-| Layer | Technologies |
-| :--- | :--- |
-| **Frontend Framework** | React 18, TypeScript, Vite |
-| **Styling & UI** | Tailwind CSS, Lucide React Icons |
-| **Data Visualization** | Recharts (Valuation curves, Set Allocation) |
-| **AI Vision Engine** | Google Gemini 3.6 Multimodal API |
-| **Hardware Integration** | Web NFC API (`NDEFReader`), Web Camera API |
-| **State & Storage** | LocalStorage Reactive Sync Service, Auth Service |
-
----
-
-## 📁 PROJECT DIRECTORY STRUCTURE
-
-```
-pokemon-scanner/
-├── docs/                        # Diagram assets and documentation screenshots
-│   ├── hero_3d_slab.svg         # 3D Slab Landing Graphic
-│   ├── vscan_ai_scanner.svg     # VScan AI Camera Reticle Graphic
-│   └── foilbook_social.svg      # Direct Messenger & Foilbook Graphic
-├── src/
-│   ├── components/              # UI Components
-│   │   ├── BreakingWire.tsx     # CNN News Ticker
-│   │   ├── FoilbookView.tsx     # Facebook Clone Social Network & Chat
-│   │   ├── GradingSubmissionWizard.tsx  # VScan AI 10-Step Submission
-│   │   ├── NfcModal.tsx         # NTAG424 CMAC Tap Verification
-│   │   ├── ProfileView.tsx      # Collector Profile & Avatar Uploads
-│   │   └── Slab3DViewer.tsx     # Interactive 3D Holographic Slab
-│   ├── services/                # LocalStorage & Auth Reactive Stores
-│   ├── types/                   # TypeScript Type Definitions
-│   ├── App.tsx                  # Root View Controller & Layout
-│   ├── main.tsx                 # Entry Point
-│   └── index.css                # Custom HUD Animations & Glitch FX
-├── public/                      # Static Assets
-├── .env.example                 # Environment Variables Template
-├── package.json                 # Dependencies & Build Scripts
-└── README.md                    # Platform Documentation
+```env
+GEMINI_API_KEY=
+PRICECHARTING_API_TOKEN=
 ```
 
+Credentials must remain server-side and must never be exposed through frontend `NEXT_PUBLIC_*` variables.
+
+If a provider is unavailable, VCA reports `UNAVAILABLE` rather than generating fake prices or identification data.
+
 ---
 
-## 🚀 QUICK START & LOCAL DEVELOPMENT
+## 🔐 QR Certificate Verification
+
+Every finalized VCA certificate can have a persistent QR record with a unique random public verification token.
+
+```text
+Certificate
+   ↓
+QR Record
+   ↓
+Random public token
+   ↓
+/verify/qr/:token
+   ↓
+Public certificate result
+```
+
+The QR verification layer is intentionally separate from the certificate serial. The public token is not treated as the certificate's secret or database primary key.
+
+Public verification is designed to expose appropriate certificate information such as:
+
+- Card identity
+- VCA grade
+- Certification status
+- Certification date
+- Slab information
+- NFC status
+- Tamper status where supported
+- Public card/slab imagery
+
+Private customer information is not exposed through public verification.
+
+---
+
+## 📡 NFC Slab Binding & Verification
+
+NFC is treated as a physical slab identity and verification layer, not automatically as cryptographic security.
+
+VCA distinguishes:
+
+```text
+IDENTIFIER_ONLY
+CRYPTOGRAPHIC
+```
+
+A normal NFC identifier can establish an association between a physical tag and a VCA certificate, but it is not automatically proof that the tag itself is cryptographically authentic.
+
+Future secure-element implementations can provide challenge/response or other cryptographic authentication when supported by the selected hardware.
+
+NFC records also support tamper states such as:
+
+```text
+UNKNOWN
+CLEAR
+SUSPECTED
+TAMPERED
+```
+
+NFC binding and tamper-state changes are restricted to authorized VCA roles and are recorded in the audit trail.
+
+---
+
+## 🧾 Grading & Certification Trust Chain
+
+```text
+Customer
+   ↓
+Submission
+   ↓
+Authorized Grader
+   ↓
+Grading Report
+   ↓
+Human Review
+   ↓
+Final Grade
+   ↓
+VCA Certificate
+   ↓
+Slab
+   ├── QR
+   └── NFC
+        ↓
+Public Verification
+```
+
+Finalized certification records are auditable. Important changes are recorded as events instead of silently rewriting certification history.
+
+---
+
+## 🏗️ Production Architecture
+
+```text
+Next.js / React / TypeScript frontend
+              │
+              ▼
+      TypeScript API layer
+              │
+       ┌──────┴──────┐
+       ▼             ▼
+ PostgreSQL       S3-compatible storage
+   + Prisma
+       │
+       ├── Authentication / RBAC
+       ├── Cards / Sets / Variants
+       ├── Submissions
+       ├── Grading
+       ├── Certificates
+       ├── QR / NFC
+       ├── Ownership
+       ├── Portfolio
+       ├── Market data
+       └── Audit logs
+```
+
+Docker, PostgreSQL, migrations, environment variables, persistent storage, health checks, HTTPS/reverse-proxy compatibility and backup procedures are part of the production architecture.
+
+---
+
+## 🎨 VCA Design System
+
+The application follows the established VCA HUD aesthetic:
+
+- Near-black graphite backgrounds
+- Electric cyan primary accent
+- Violet secondary accent
+- Gold/amber reserved for premium grade/mint moments
+- Orbitron display typography
+- JetBrains Mono for serials/data
+- Glass panels
+- Scanline/HUD effects
+- Holographic foil effects
+- Premium slab presentation
+- Reduced-motion fallbacks
+
+The canonical slab includes VCA branding, NFC badge, card window, grade, card identity, metadata, serial/certificate information and QR presentation.
+
+---
+
+## 🧰 Technology Stack
+
+| Layer | Production direction |
+|---|---|
+| Frontend | Next.js / React / TypeScript |
+| API | Node.js / TypeScript |
+| Database | PostgreSQL |
+| ORM | Prisma |
+| Storage | S3-compatible object storage |
+| Infrastructure | Docker / Linux VPS |
+| Reverse proxy | Nginx or Caddy |
+| Camera | Browser MediaDevices / camera APIs |
+| Vision | Configurable external vision provider |
+| Market data | Configurable reputable market-data providers |
+| NFC | Browser/native NFC adapters depending on hardware |
+| Authentication | Secure server-side sessions + RBAC |
+
+The repository may still contain legacy prototype components during migration. Those are not automatically considered production-ready merely because they remain in the codebase.
+
+---
+
+## 🚀 Local Development
 
 ### Prerequisites
-* **Node.js**: v18.0.0 or higher
-* **npm** or **bun**
 
-### Installation Steps
+- Node.js 18+
+- npm
+- Docker / Docker Compose
+- PostgreSQL through the provided Docker configuration
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/t-sinclair2500/pokemon-scanner.git
-   cd pokemon-scanner
-   ```
+### Install
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-3. **Configure Environment Variables**:
-   Copy `.env.example` to `.env` and set your optional Gemini API key:
-   ```bash
-   cp .env.example .env
-   ```
+### Configure
 
-4. **Start the Development Server**:
-   ```bash
-   npm run dev
-   ```
+```bash
+cp .env.example .env
+```
 
-5. **Open in Browser**:
-   Navigate to `http://localhost:3000` to access the live application.
+Set the required database/session variables and any external provider credentials you intend to enable.
+
+### Generate Prisma client
+
+```bash
+npx prisma generate --schema packages/database/prisma/schema.prisma
+```
+
+### Apply production migrations
+
+```bash
+npx prisma migrate deploy --schema packages/database/prisma/schema.prisma
+```
+
+### Development database migration
+
+```bash
+npx prisma migrate dev --schema packages/database/prisma/schema.prisma
+```
+
+> A live database migration, full application build and end-to-end camera/market-provider test must be executed in an environment with the required dependencies and credentials before those checks are reported as passed.
 
 ---
 
-## 📄 LICENSE
+## 📋 Recent Production Changes
 
-This project is licensed under the **MIT License**.
+### QR + NFC trust layer
+
+- Added persistent QR certificate records
+- Added unique public QR verification tokens
+- Added QR verification endpoint
+- Added NFC certificate/slab binding
+- Added NFC verification endpoint
+- Added NFC security-level distinction
+- Added tamper-status tracking
+- Added verification/binding audit events
+- Prevented duplicate NFC identifier binding
+
+### VScan production correction
+
+- Replaced prototype/sample-card scanner behavior with real camera capture architecture
+- Rear camera is preferred for physical-card capture
+- Added capture/review/retake flow
+- Added image upload path
+- Added provider-backed identification boundary
+- Removed fake identification fallback from the production path
+- Added market-data provider architecture
+- Added RAW / PSA 8 / PSA 9 / PSA 10 result structure
+- Added source/timestamp requirements for market observations
+- Added explicit unavailable states when providers are not configured
+
+### Grading/certification foundation
+
+- Added authorized grader workflow
+- Added grading report persistence
+- Added human-review boundary
+- Added certificate generation
+- Added unique certificate identifiers
+- Added certificate verification data
+- Added audit logging
+
+---
+
+## ⚠️ Production Verification Policy
+
+The following are **not claimed as production-tested simply because the code exists**:
+
+- Live PostgreSQL migration
+- Live production build
+- Live camera test on a physical device
+- Live vision-provider identification
+- Live market-provider pricing
+- Live NFC hardware verification
+- Payment processing
+- VPS deployment
+
+Each dependency must be configured and tested before its capability is marked operational.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
 
 *Copyright © 2026 VCA Verified Card Authority. All Rights Reserved.*
