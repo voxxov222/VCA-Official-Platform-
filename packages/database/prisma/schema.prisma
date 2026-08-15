@@ -7,44 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserStatus {
-  ACTIVE
-  SUSPENDED
-  DISABLED
-}
+enum UserStatus { ACTIVE SUSPENDED DISABLED }
+enum UserRole { CUSTOMER GRADER ADMIN }
+enum CertificateStatus { PENDING IN_REVIEW CERTIFIED VERIFIED SUSPENDED REVOKED }
+enum SubmissionStatus { DRAFT RECEIVED IN_REVIEW GRADING AWAITING_APPROVAL CERTIFIED RETURNED CANCELLED }
+enum SlabStatus { ASSEMBLY ACTIVE SUSPENDED RETIRED }
 
-enum UserRole {
-  CUSTOMER
-  GRADER
-  ADMIN
-}
+enum VerificationSecurityLevel { IDENTIFIER_ONLY CRYPTOGRAPHIC }
 
-enum CertificateStatus {
-  PENDING
-  IN_REVIEW
-  CERTIFIED
-  VERIFIED
-  SUSPENDED
-  REVOKED
-}
-
-enum SubmissionStatus {
-  DRAFT
-  RECEIVED
-  IN_REVIEW
-  GRADING
-  AWAITING_APPROVAL
-  CERTIFIED
-  RETURNED
-  CANCELLED
-}
-
-enum SlabStatus {
-  ASSEMBLY
-  ACTIVE
-  SUSPENDED
-  RETIRED
-}
+enum TamperStatus { UNKNOWN CLEAR SUSPECTED TAMPERED }
 
 model User {
   id           String     @id @default(cuid())
@@ -82,16 +53,16 @@ model CardSet {
 }
 
 model Card {
-  id          String      @id @default(cuid())
-  setId       String
-  name        String
-  collectorNo String?
-  variant     String?
-  language    String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  set         CardSet     @relation(fields: [setId], references: [id])
-  submissions Submission[]
+  id           String       @id @default(cuid())
+  setId        String
+  name         String
+  collectorNo  String?
+  variant      String?
+  language     String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  set          CardSet      @relation(fields: [setId], references: [id])
+  submissions  Submission[]
   @@index([name])
   @@index([setId, collectorNo])
 }
@@ -111,23 +82,23 @@ model Submission {
 }
 
 model GradingReport {
-  id                  String   @id @default(cuid())
-  submissionId        String
-  methodologyVersion  String
-  centering           Decimal? @db.Decimal(4,2)
-  corners             Decimal? @db.Decimal(4,2)
-  edges               Decimal? @db.Decimal(4,2)
-  surface             Decimal? @db.Decimal(4,2)
-  printQuality        Decimal? @db.Decimal(4,2)
-  whitening           Decimal? @db.Decimal(4,2)
-  defects             Json?
-  proposedGrade       Decimal? @db.Decimal(3,1)
-  humanGrade          Decimal? @db.Decimal(3,1)
-  finalizedAt         DateTime?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  submission          Submission @relation(fields: [submissionId], references: [id])
-  certificate         Certificate?
+  id                 String       @id @default(cuid())
+  submissionId       String
+  methodologyVersion String
+  centering          Decimal?     @db.Decimal(4,2)
+  corners            Decimal?     @db.Decimal(4,2)
+  edges              Decimal?     @db.Decimal(4,2)
+  surface            Decimal?     @db.Decimal(4,2)
+  printQuality       Decimal?     @db.Decimal(4,2)
+  whitening          Decimal?     @db.Decimal(4,2)
+  defects            Json?
+  proposedGrade      Decimal?     @db.Decimal(3,1)
+  humanGrade         Decimal?     @db.Decimal(3,1)
+  finalizedAt        DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  submission         Submission   @relation(fields: [submissionId], references: [id])
+  certificate        Certificate?
   @@index([submissionId, createdAt])
 }
 
@@ -147,6 +118,7 @@ model Certificate {
   grader           User?             @relation("CertificateGrader", fields: [graderId], references: [id])
   slab             Slab?
   nfcRecord        NFCRecord?
+  qrRecord         QRRecord?
   @@index([status])
 }
 
@@ -162,17 +134,30 @@ model Slab {
 }
 
 model NFCRecord {
+  id             String                    @id @default(cuid())
+  certificateId  String                    @unique
+  identifier     String                    @unique
+  securityLevel  VerificationSecurityLevel @default(IDENTIFIER_ONLY)
+  tamperStatus   TamperStatus              @default(UNKNOWN)
+  lastVerifiedAt DateTime?
+  createdAt      DateTime                  @default(now())
+  updatedAt      DateTime                  @updatedAt
+  certificate    Certificate               @relation(fields: [certificateId], references: [id])
+  slab           Slab?                     @relation(fields: [slabId], references: [id])
+  slabId         String?                   @unique
+  @@index([certificateId, securityLevel])
+}
+
+model QRRecord {
   id            String      @id @default(cuid())
   certificateId String      @unique
-  identifier    String      @unique
-  securityLevel String
-  tamperStatus  String?
+  publicToken   String      @unique
+  active        Boolean     @default(true)
+  scanCount     Int         @default(0)
   lastVerifiedAt DateTime?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   certificate   Certificate @relation(fields: [certificateId], references: [id])
-  slab          Slab?       @relation(fields: [slabId], references: [id])
-  slabId        String?     @unique
 }
 
 model AuditLog {
