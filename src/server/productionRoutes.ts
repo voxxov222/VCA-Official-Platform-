@@ -2,6 +2,7 @@ import { createHash, randomBytes, scryptSync, timingSafeEqual } from 'node:crypt
 import type { Express, NextFunction, Request, Response } from 'express';
 import { prisma } from '../../packages/database/src/client.js';
 import { databaseHealth } from '../../packages/database/src/health.js';
+import { registerGradingRoutes } from './gradingRoutes.js';
 
 const SESSION_DAYS = 7;
 const SESSION_COOKIE = 'vca_session';
@@ -226,6 +227,8 @@ export function registerProductionRoutes(app: Express): void {
       next(error);
     }
   });
+
+  registerGradingRoutes(app);
 
   app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
     console.error('VCA API error:', error);
