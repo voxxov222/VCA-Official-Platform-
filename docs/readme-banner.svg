@@ -1,0 +1,58 @@
+<svg width="1200" height="300" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#05050a"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00fff2"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="300" fill="url(#bg)"/>
+
+  <!-- animated scanline sweep -->
+  <rect x="0" y="-40" width="1200" height="40" fill="#00fff2" opacity="0.06">
+    <animate attributeName="y" values="-40;300;-40" dur="6s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- drifting particle grid -->
+  <g opacity="0.35">
+    <circle cx="120" cy="60" r="2" fill="#00fff2">
+      <animate attributeName="cy" values="60;240;60" dur="9s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="980" cy="90" r="2" fill="#a855f7">
+      <animate attributeName="cy" values="90;20;90" dur="7s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="700" cy="220" r="1.5" fill="#00fff2">
+      <animate attributeName="cx" values="700;760;700" dur="5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="200" r="1.5" fill="#a855f7">
+      <animate attributeName="cy" values="200;150;200" dur="8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- title -->
+  <text x="60" y="150" font-family="'Orbitron', 'JetBrains Mono', monospace" font-size="42"
+        fill="url(#accentGrad)" filter="url(#glow)" font-weight="700">
+    VCA — Verified Card Authority
+  </text>
+
+  <!-- animated underline -->
+  <rect x="60" y="168" width="0" height="3" fill="url(#accentGrad)">
+    <animate attributeName="width" values="0;520;520" dur="2.4s" fill="freeze"/>
+  </rect>
+
+  <!-- subtitle -->
+  <text x="60" y="205" font-family="'JetBrains Mono', monospace" font-size="16" fill="#00fff2" opacity="0.85">
+    Grading for the people PSA is currently failing
+  </text>
+</svg>

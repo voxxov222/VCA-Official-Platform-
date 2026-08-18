@@ -1,6 +1,25 @@
 # 🛡️ VCA — VERIFIED CARD AUTHORITY
 ### Production collectible-card authentication, grading, verification, valuation & NFC platform
 
+<div align="center">
+
+![banner](./docs/readme-banner.svg)
+
+<!-- STATS:START -->
+| Metric | Value |
+|---|---|
+| Commits | 24 |
+| Contributors | 1 |
+| Last updated | 2026-08-15 |
+| Top languages | .tsx, .ts, .svg, .md, .json |
+<!-- STATS:END -->
+
+![Last Commit](https://img.shields.io/github/last-commit/voxxov222/VCA-Official-Platform-)
+![Top Language](https://img.shields.io/github/languages/top/voxxov222/VCA-Official-Platform-)
+![License](https://img.shields.io/github/license/voxxov222/VCA-Official-Platform-)
+
+</div>
+
 VCA (Verified Card Authority) is being built as a production-ready, self-hostable platform for collectible-card authentication, grading, certification, ownership, valuation, portfolios, marketplace workflows, VScan AI, QR verification and NFC-enabled slabs.
 
 > **Production integrity rule:** VCA does not present simulated identification, grading, pricing, NFC verification, payment confirmation, or deployment results as real functionality. External integrations are explicitly marked unavailable until configured and verified.
